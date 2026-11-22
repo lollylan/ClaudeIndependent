@@ -67,7 +67,7 @@ function melden(text, mitRueckgaengig) {
 
 function route() {
   const r = location.hash.replace(/^#\/?/, '');
-  return ['katalog', 'werdegang', 'daten'].includes(r) ? r : '';
+  return ['katalog', 'werdegang', 'daten', 'impressum'].includes(r) ? r : '';
 }
 
 function ansichtUebersicht() {
@@ -342,6 +342,57 @@ function ansichtDaten() {
     </section>`;
 }
 
+// Vom Betreiber vorgegeben. Inhalt nicht ändern (CLAUDE.md, Leitplanke 4).
+function ansichtImpressum() {
+  return `
+    <header class="seitenkopf">
+      <h1 tabindex="-1">Impressum</h1>
+      <p>Stichtag ist ein kostenloses, nicht kommerzielles Experiment aus der Hausarztpraxis Dr. Rasche in Würzburg.</p>
+    </header>
+
+    <section class="abschnitt">
+      <h2>Angaben gemäß § 5 DDG</h2>
+      <address class="text">
+        Dr. med. Florian Rasche<br>
+        Facharzt für Allgemeinmedizin<br>
+        Huttenstraße 6<br>
+        97072 Würzburg<br>
+        Deutschland
+      </address>
+    </section>
+
+    <section class="abschnitt">
+      <h2>Kontakt</h2>
+      <dl class="angaben">
+        <dt>Telefon</dt><dd><a href="tel:+4993172525">0931 / 72525</a></dd>
+        <dt>Fax</dt><dd>0931 / 76264</dd>
+        <dt>E-Mail</dt><dd><a href="mailto:praxis@dr-rasche.de">praxis@dr-rasche.de</a></dd>
+        <dt>Praxis</dt><dd><a href="https://www.dr-rasche.de" rel="noopener">www.dr-rasche.de</a></dd>
+      </dl>
+    </section>
+
+    <section class="abschnitt">
+      <h2>Berufsrechtliche Angaben</h2>
+      <div class="text">
+        <p>Berufsbezeichnung: Arzt, verliehen in der Bundesrepublik Deutschland. Zuständige Kammer: Bayerische Landesärztekammer, Mühlbaurstraße 16, 81677 München (<a href="https://www.blaek.de" rel="noopener">www.blaek.de</a>). Zuständige Aufsichtsbehörde: Regierung von Unterfranken, Peterplatz 9, 97070 Würzburg.</p>
+        <p>Es gelten die Berufsordnung für die Ärzte Bayerns, das Heilberufe-Kammergesetz und die Bundesärzteordnung, einsehbar auf der Website der Bayerischen Landesärztekammer.</p>
+      </div>
+    </section>
+
+    <section class="abschnitt">
+      <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+      <div class="text"><p>Dr. med. Florian Rasche, Huttenstraße 6, 97072 Würzburg</p></div>
+    </section>
+
+    <section class="abschnitt">
+      <h2>Haftung</h2>
+      <div class="text">
+        <p>Stichtag wird ohne Gewähr bereitgestellt. Das Programm wird von KI-Agenten ohne menschliche Freigabe weiterentwickelt; Inhalte und Funktionen können sich täglich ändern und Fehler enthalten. Der Katalog ist eine Gedächtnisstütze und keine Rechtsberatung. Für Inhalte verlinkter Seiten ist der jeweilige Anbieter verantwortlich.</p>
+        <p>Angaben zum Datenschutz stehen unter <a href="#/daten">Daten und Rechtliches</a>. Der Quellcode liegt auf <a href="https://github.com/lollylan/ClaudeIndependent" rel="noopener">GitHub</a>.</p>
+      </div>
+    </section>`;
+}
+
 // ---------- Zeichnen ----------
 
 function fokusSchluessel(el) {
@@ -356,14 +407,14 @@ function fokusSchluessel(el) {
 function zeichnen({ neueSeite = false, frisch = null } = {}) {
   const r = route();
   const fokus = neueSeite ? null : fokusSchluessel(document.activeElement);
-  const ansichten = { '': ansichtUebersicht, katalog: ansichtKatalog, werdegang: ansichtWerdegang, daten: ansichtDaten };
+  const ansichten = { '': ansichtUebersicht, katalog: ansichtKatalog, werdegang: ansichtWerdegang, daten: ansichtDaten, impressum: ansichtImpressum };
   inhalt.innerHTML = ansichten[r]();
 
   for (const a of document.querySelectorAll('.hauptnav a')) {
     if (a.dataset.route === r) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
-  document.title = { '': 'Stichtag – Pflichtenkalender für die Arztpraxis', katalog: 'Katalog – Stichtag', werdegang: 'Werdegang – Stichtag', daten: 'Daten und Rechtliches – Stichtag' }[r];
+  document.title = { '': 'Stichtag – Pflichtenkalender für die Arztpraxis', katalog: 'Katalog – Stichtag', werdegang: 'Werdegang – Stichtag', daten: 'Daten und Rechtliches – Stichtag', impressum: 'Impressum – Stichtag' }[r];
 
   if (neueSeite) {
     window.scrollTo(0, 0);

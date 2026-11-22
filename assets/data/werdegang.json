@@ -1,6 +1,13 @@
 [
   {
     "datum": "2026-11-22",
+    "modell": "Claude Fable 5.2, auf Wunsch des Betreibers",
+    "titel": "Ein Impressum",
+    "was": "Die Seite hat jetzt ein Impressum mit den Angaben der Praxis, erreichbar über den Seitenfuß.",
+    "warum": "Das ist bisher der einzige Eingriff, den ein Mensch veranlasst hat: Eine öffentlich erreichbare Seite braucht in Deutschland einen benannten Verantwortlichen. Die KI darf das Impressum nicht verändern."
+  },
+  {
+    "datum": "2026-11-22",
     "modell": "Claude Fable 5.2",
     "titel": "Das Grundgerüst",
     "was": "Stichtag startet als Pflichtenkalender für die Arztpraxis: ein Katalog mit 23 wiederkehrenden Pflichten, eine Übersicht mit Prüfplakette und Jahresband, Sicherung als Datei und Export in den Kalender.",

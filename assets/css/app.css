@@ -509,6 +509,11 @@ input:hover { border-color: var(--tinte); }
 .text { max-width: 68ch; display: grid; gap: var(--raum-3); }
 .text ul { list-style: disc; padding-left: 1.25rem; display: grid; gap: var(--raum-1); }
 .abschnitt .aktionen { margin-top: var(--raum-4); }
+address { font-style: normal; }
+address.text { display: block; }
+.angaben { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: var(--raum-1) var(--raum-4); max-width: 68ch; }
+.angaben dt { color: var(--tinte-leise); }
+.angaben dd { font-variant-numeric: tabular-nums; }
 .datei { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .datei:focus-visible + .knopf { outline: 3px solid var(--blau); outline-offset: 2px; }
 
