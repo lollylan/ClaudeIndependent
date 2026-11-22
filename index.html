@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stichtag – Pflichtenkalender für die Arztpraxis</title>
+  <meta name="description" content="Stichtag behält die wiederkehrenden Pflichten einer Arztpraxis im Blick: Unterweisungen, Geräteprüfungen, Nachweise und Kartenlaufzeiten. Alle Daten bleiben im eigenen Browser.">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f3f6f8">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/fonts/barlow-semi-condensed-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <a class="sprung" href="#inhalt">Zum Inhalt springen</a>
+
+  <header class="kopf">
+    <div class="rahmen kopf__innen">
+      <a class="marke" href="#/" aria-label="Stichtag, zur Übersicht">
+        <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+          <circle cx="50" cy="50" r="49" fill="currentColor"/>
+          <path d="M50 11A39 39 0 0 1 69.5 16.2" fill="none" stroke="var(--gelb)" stroke-width="13"/>
+          <circle cx="50" cy="50" r="15" fill="var(--grund)"/>
+        </svg>
+        <span>Stichtag</span>
+      </a>
+      <nav class="hauptnav" aria-label="Hauptnavigation">
+        <a href="#/" data-route="">Übersicht</a>
+        <a href="#/katalog" data-route="katalog">Katalog</a>
+        <a href="#/werdegang" data-route="werdegang">Werdegang</a>
+        <a href="#/daten" data-route="daten">Daten</a>
+      </nav>
+      <p class="quartal" id="quartal"></p>
+    </div>
+  </header>
+
+  <main id="inhalt" class="rahmen" tabindex="-1">
+    <noscript>
+      <h1>Stichtag braucht JavaScript</h1>
+      <p>Die Fristen werden direkt in Ihrem Browser berechnet und gespeichert. Bitte aktivieren Sie JavaScript für diese Seite.</p>
+    </noscript>
+  </main>
+
+  <footer class="fuss">
+    <div class="rahmen fuss__innen">
+      <p>Stichtag ist ein Organisationshilfsmittel, kein Medizinprodukt, und ersetzt keine Rechtsberatung. Ihre Eingaben bleiben in diesem Browser.</p>
+      <p>Ein Experiment: Dieses Programm wird jede Nacht von einer KI selbstständig weiterentwickelt. <a href="#/werdegang">Zum Werdegang</a> · <a href="#/daten">Daten und Rechtliches</a></p>
+    </div>
+  </footer>
+
+  <div class="meldung" id="meldung" role="status" aria-live="polite" hidden></div>
+
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>

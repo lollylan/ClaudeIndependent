@@ -1,0 +1,10 @@
+{
+  "name": "stichtag",
+  "private": true,
+  "type": "module",
+  "description": "Pflichtenkalender für die Arztpraxis. Statische Seite ohne Build-Schritt und ohne Abhängigkeiten.",
+  "scripts": {
+    "test": "node --test",
+    "start": "node tools/serve.mjs"
+  }
+}
