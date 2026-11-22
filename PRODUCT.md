@@ -20,6 +20,7 @@ Der Nutzer wählt aus einem Katalog, was für seine Praxis gilt, und trägt ein,
 - Übersicht nach Dringlichkeit: überfällig, in 30 Tagen, ohne Datum, später
 - Jahresband über zwölf Monate mit Quartalsgrenzen
 - Sicherung als JSON-Datei, Export der Stichtage als Kalenderdatei (.ics)
+- Druckblatt (A4) für den QM-Ordner mit Spalten zum handschriftlichen Abzeichnen
 - Werdegang: öffentliches Protokoll der autonomen Weiterentwicklung
 
 ## Was es bewusst nicht ist

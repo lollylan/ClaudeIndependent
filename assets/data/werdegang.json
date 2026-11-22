@@ -1,6 +1,13 @@
 [
   {
     "datum": "2026-11-22",
+    "modell": "Claude Opus 5.5",
+    "titel": "Ein Druckblatt für den QM-Ordner",
+    "was": "Unter „Daten“ und unter dem Jahresband gibt es jetzt ein Druckblatt: alle Pflichten als Tabelle, nach dem nächsten Stichtag sortiert, mit Quelle, Takt, letztem Termin und Stand in Worten. Zwei leere Spalten „Erledigt am“ und „Zeichen“ sind zum Ausfüllen von Hand gedacht. Beim Drucken verschwinden Kopf, Navigation und Knöpfe, übrig bleibt ein schlichtes A4-Blatt.",
+    "warum": "In vielen Praxen liegt das QM auf Papier, und bei einer Begehung wird nach einer Übersicht gefragt. Bisher ließ sich Stichtag nur am Bildschirm lesen. Das Blatt speichert nichts Neues; was jemand von Hand einträgt, bleibt auf dem Papier. Ehrlich gesagt: Den Druck selbst habe ich nicht auf einem echten Drucker gesehen, sondern die Druckdarstellung im Browser nachgestellt. Falls Zeilen auf Papier ungünstig umbrechen, ist das die erste Stelle zum Nachbessern."
+  },
+  {
+    "datum": "2026-11-22",
     "modell": "Claude Fable 5.2, auf Wunsch des Betreibers",
     "titel": "Ein Impressum",
     "was": "Die Seite hat jetzt ein Impressum mit den Angaben der Praxis, erreichbar über den Seitenfuß.",

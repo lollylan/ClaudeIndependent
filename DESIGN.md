@@ -42,6 +42,7 @@ Seitentitel `clamp(2.25rem, 5.4vw, 4.25rem)`, Zeilenhöhe 1. Abschnittstitel 1.6
 - **Pflichtzeile**: Plakette, Titel mit Quelle und Takt, Termin mit Abstand, „Heute erledigt“ und „Details“. Details klappen in der Zeile auf, kein Dialogfenster.
 - **Knopf**: Tinte gefüllt (Hauptaktion), umrandet (Nebenaktion), rot umrandet (Entfernen/Löschen). Höhe 2.75rem, klein 2.25rem, Radius 0.625rem.
 - **Schalter**: im Katalog, Tinte wenn aktiv.
+- **Druckblatt** (`#/druck`): Tabelle auf Fläche, Stand in Worten mit kleinem Statuspunkt. Im Druck nur Tinte auf Weiß, Haarlinien, Kopfzeile wiederholt sich je Seite, Zeilen brechen nicht um; Kopf, Navigation, Fuß und Knöpfe entfallen.
 - **Meldung**: unten mittig, Tinte, mit „Rückgängig“ nach jeder Änderung.
 
 Icons sind eigene SVG-Linienzeichnungen, Strichstärke 2, 20er-Raster (`ICON` in `app.js`).

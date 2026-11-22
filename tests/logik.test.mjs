@@ -83,3 +83,27 @@ test('ICS enthält nur Pflichten mit Datum', () => {
   assert.ok(ics.includes('SUMMARY:Stichtag: Feuerlöscher\\; Prüfung'));
   assert.ok(ics.endsWith('END:VCALENDAR\r\n'));
 });
+
+test('Druckblatt sortiert nach Stichtag und benennt den Stand', async () => {
+  const { druckZeilen, druckZusammenfassung } = await import('../assets/js/druck.js');
+  const heute = tag('2026-11-22');
+  const katalog = KATALOG.find((k) => !k.richtwert);
+  const zeilen = druckZeilen([
+    { id: 'c', katalogId: null, titel: 'Ohne Datum B', intervallMonate: 12, zuletzt: null, notiz: '' },
+    { id: 'a', katalogId: null, titel: 'Später', intervallMonate: 24, zuletzt: '2026-01-10', notiz: 'Raum 2' },
+    { id: 'b', katalogId: katalog.id, titel: katalog.titel, intervallMonate: 12, zuletzt: '2025-10-01', notiz: '' },
+    { id: 'd', katalogId: null, titel: 'Ohne Datum A', intervallMonate: 6, zuletzt: null, notiz: '' },
+  ], heute);
+  assert.deepEqual(zeilen.map((z) => z.id), ['b', 'a', 'd', 'c']);
+  assert.equal(zeilen[0].stand, 'überfällig');
+  assert.equal(zeilen[0].grundlage, katalog.grundlage);
+  assert.equal(zeilen[0].faellig, '01.10.2026');
+  assert.equal(zeilen[1].zuletzt, '10.01.2026');
+  assert.equal(zeilen[1].takt, 'alle 2 Jahre');
+  assert.equal(zeilen[1].grundlage, 'Eigene Pflicht');
+  assert.equal(zeilen[1].notiz, 'Raum 2');
+  assert.equal(zeilen[2].faellig, '');
+  assert.equal(zeilen[2].stand, 'ohne Datum');
+  assert.equal(druckZusammenfassung(zeilen), '4 Pflichten, 1 überfällig, 2 ohne Datum');
+  assert.equal(druckZusammenfassung([]), '0 Pflichten');
+});

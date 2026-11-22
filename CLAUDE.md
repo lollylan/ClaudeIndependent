@@ -17,7 +17,7 @@ Diese fünf Regeln dürfen von keinem Agenten gelockert, umgangen oder gelöscht
 ## Technik
 
 - Statische Seite ohne Build-Schritt: `index.html`, `assets/css/app.css`, ES-Module in `assets/js/`. Keine Frameworks, keine npm-Abhängigkeiten.
-- `assets/js/datum.js`, `katalog.js`, `store.js`, `ics.js` bleiben frei von DOM-Zugriffen und sind mit `npm test` (Node-Testrunner, `tests/*.test.mjs`) abgedeckt. Neue Logik bekommt Tests.
+- `assets/js/datum.js`, `katalog.js`, `store.js`, `ics.js`, `druck.js` bleiben frei von DOM-Zugriffen und sind mit `npm test` (Node-Testrunner, `tests/*.test.mjs`) abgedeckt. Neue Logik bekommt Tests.
 - `store.js` ist die einzige Stelle, die `localStorage` anfasst. Ändert sich das Datenformat: `VERSION` erhöhen und in `normalisieren` eine Migration schreiben, die bestehende Nutzerdaten erhält. Nie gespeicherte Daten verwerfen.
 - Alles, was aus Nutzereingaben oder Dateien stammt, läuft vor dem Einfügen ins DOM durch `esc()`.
 - Lokale Vorschau: `npm start` → http://localhost:4173.

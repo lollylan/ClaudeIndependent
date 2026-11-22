@@ -525,6 +525,89 @@ address.text { display: block; }
   max-width: 46rem;
 }
 
+/* Druckblatt */
+
+.druck__aktionen { margin-top: var(--raum-5); }
+
+.druck__rahmen {
+  overflow-x: auto;
+  background: var(--flaeche);
+  border: 1px solid var(--linie);
+  border-radius: var(--radius);
+}
+.druck {
+  width: 100%;
+  min-width: 46rem;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+.druck th, .druck td {
+  padding: var(--raum-2) var(--raum-3);
+  border-bottom: 1px solid var(--linie);
+  text-align: left;
+  vertical-align: top;
+}
+.druck tbody tr:last-child > * { border-bottom: 0; }
+.druck thead th {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--tinte-leise);
+  border-bottom-color: var(--linie-stark);
+  white-space: nowrap;
+}
+.druck tbody th { font-weight: 400; }
+.druck__titel { display: block; font-weight: 600; line-height: 1.3; }
+.druck__quelle { display: block; font-size: 0.8125rem; color: var(--tinte-leise); }
+.druck__datum { white-space: nowrap; }
+.druck__datum strong { font-weight: 600; }
+.druck__richtwert { display: block; font-size: 0.8125rem; color: var(--tinte-leise); }
+.druck__stand { display: inline-flex; align-items: center; gap: 0.4em; white-space: nowrap; }
+.druck__stand::before {
+  content: '';
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+  background: var(--s-farbe, transparent);
+  border: 1.5px solid var(--s-rand, var(--linie-stark));
+}
+.druck__zeile--ueberfaellig .druck__stand { color: var(--rot-text); font-weight: 600; --s-farbe: var(--rot); --s-rand: var(--rot); }
+.druck__zeile--bald .druck__stand { color: var(--gelb-text); font-weight: 600; --s-farbe: var(--gelb); --s-rand: var(--gelb-text); }
+.druck__zeile--geplant .druck__stand { --s-farbe: var(--gruen); --s-rand: var(--gruen); }
+.druck__frei { min-width: 6.5rem; border-left: 1px solid var(--linie); }
+.druck__fuss { margin-top: var(--raum-4); max-width: 70ch; font-size: 0.875rem; color: var(--tinte-leise); }
+.nur-druck { display: none; }
+
+@page { size: A4 portrait; margin: 14mm 12mm; }
+
+@media print {
+  body { background: #fff; font-size: 10pt; }
+  .kopf, .fuss, .sprung, .meldung, .druck__aktionen, .band__fuss a { display: none !important; }
+  main { padding: 0; max-width: none; }
+  .rahmen { padding-inline: 0; }
+  *, *::before, *::after { animation: none !important; transition: none !important; box-shadow: none !important; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .druck__kopf { display: none; }
+  .nur-druck {
+    display: table-caption;
+    caption-side: top;
+    padding-bottom: 4mm;
+    text-align: left;
+    font: 600 10pt/1.4 var(--schrift);
+  }
+  .druck__rahmen { overflow: visible; border: 0; border-radius: 0; background: none; }
+  .druck { min-width: 0; font-size: 8.5pt; }
+  .druck th, .druck td { padding: 1.6mm 1.8mm; border-bottom: 0.25pt solid #999; }
+  .druck thead th { font-size: 7.5pt; color: #000; border-bottom: 0.75pt solid #000; }
+  .druck thead { display: table-header-group; }
+  .druck tr { break-inside: avoid; }
+  .druck tbody th { width: 38%; }
+  .druck__quelle, .druck__richtwert { font-size: 7.5pt; color: #333; }
+  .druck__frei { width: 22mm; min-width: 0; border-left: 0.25pt solid #999; }
+  .druck__fuss { font-size: 7.5pt; color: #333; margin-top: 4mm; }
+}
+
 /* Meldung */
 
 .meldung {

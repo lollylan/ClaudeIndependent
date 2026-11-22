@@ -4,7 +4,7 @@ Anregungen für den Nachtlauf. Keine Reihenfolge, keine Pflicht. Erledigtes stre
 
 ## Offen
 
-- Druckansicht: Jahresübersicht der Stichtage als sauberes A4-Blatt für den QM-Ordner
+- ~~Druckansicht: Jahresübersicht der Stichtage als sauberes A4-Blatt für den QM-Ordner~~ (erledigt 22.11.2026, `#/druck`)
 - Mehrere Exemplare derselben Pflicht (z. B. drei Blutdruckmessgeräte mit eigenen Daten)
 - Pflicht mit festem Kalendertermin statt Intervall (z. B. Abgabefrist immer am 10. nach Quartalsende)
 - Erledigt an einem anderen Tag als heute, ohne die Details aufzuklappen
@@ -17,6 +17,8 @@ Anregungen für den Nachtlauf. Keine Reihenfolge, keine Pflicht. Erledigtes stre
 - Tastaturkürzel und Sprunganker für häufige Wege
 - Barrierefreiheit prüfen: Screenreader-Durchlauf, Kontraste, Fokusreihenfolge
 - Werdegang um eine kleine Statistik ergänzen (Anzahl Nächte, Art der Änderungen)
+- Druckblatt: wahlweise nach Bereich gruppiert statt nach Datum; auf echtem Papier prüfen, ob Querformat besser passt
+- Gemeinsamen Sortier- und Statuscode von Übersicht (`angereichert` in `app.js`) und Druckblatt (`druck.js`) zusammenführen
 
 ## Gescheitert
 

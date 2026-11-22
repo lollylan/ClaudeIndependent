@@ -3,6 +3,7 @@ import * as D from './datum.js';
 import { laden, speichern, normalisieren, ausKatalog, eigenePflicht, leererZustand } from './store.js';
 import { plakette } from './plakette.js';
 import { alsICS } from './ics.js';
+import { druckZeilen, druckZusammenfassung } from './druck.js';
 
 const inhalt = document.getElementById('inhalt');
 const meldungEl = document.getElementById('meldung');
@@ -22,6 +23,7 @@ const ICON = {
   plus: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>',
   herunter: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3v10M5.5 9l4.5 4.5L14.5 9M4 17h12"/></svg>',
   hoch: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14V4M5.5 8L10 3.5 14.5 8M4 17h12"/></svg>',
+  drucker: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 7.5V3h9v4.5M5.5 14H3.5v-6.5h13V14h-2"/><rect x="5.5" y="11.5" width="9" height="5.5" rx="0.5"/></svg>',
   kalender: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="14" height="12.5" rx="2"/><path d="M3 8.5h14M7 2.5v4M13 2.5v4"/></svg>',
 };
 
@@ -67,7 +69,7 @@ function melden(text, mitRueckgaengig) {
 
 function route() {
   const r = location.hash.replace(/^#\/?/, '');
-  return ['katalog', 'werdegang', 'daten', 'impressum'].includes(r) ? r : '';
+  return ['katalog', 'werdegang', 'daten', 'impressum', 'druck'].includes(r) ? r : '';
 }
 
 function ansichtUebersicht() {
@@ -169,7 +171,7 @@ function jahresband(liste) {
           ${marken}
         </div>
       </div>
-      <p class="band__fuss">Die Linie markiert heute. ${imBand.length === 0 ? 'In diesem Zeitraum liegt noch kein Stichtag.' : 'Ein Klick auf einen Punkt führt zur Pflicht.'}${spaeter ? ` ${spaeter === 1 ? 'Ein weiterer Stichtag liegt' : `${spaeter} weitere Stichtage liegen`} dahinter.` : ''}</p>
+      <p class="band__fuss">Die Linie markiert heute. ${imBand.length === 0 ? 'In diesem Zeitraum liegt noch kein Stichtag.' : 'Ein Klick auf einen Punkt führt zur Pflicht.'}${spaeter ? ` ${spaeter === 1 ? 'Ein weiterer Stichtag liegt' : `${spaeter} weitere Stichtage liegen`} dahinter.` : ''} <a href="#/druck">Als Druckblatt für den QM-Ordner</a></p>
     </section>`;
 }
 
@@ -311,6 +313,7 @@ function ansichtDaten() {
           <label class="knopf knopf--still" for="import">${ICON.hoch}Sicherung einspielen</label>
         </span>
         <button class="knopf knopf--still" type="button" data-ics>${ICON.kalender}Stichtage als Kalenderdatei</button>
+        <a class="knopf knopf--still" href="#/druck">${ICON.drucker}Druckblatt</a>
       </div>
     </section>
 
@@ -340,6 +343,60 @@ function ansichtDaten() {
         <button class="knopf knopf--gefahr" type="button" data-loeschen${anzahl === 0 ? ' disabled' : ''}>Alle Daten löschen</button>
       </div>
     </section>`;
+}
+
+function ansichtDruck() {
+  const zeilen = druckZeilen(zustand.pflichten);
+  const stand = D.formatDatum(D.heute());
+  if (zeilen.length === 0) {
+    return `
+      <header class="seitenkopf">
+        <h1 tabindex="-1">Druckblatt</h1>
+        <p>Hier entsteht eine Übersicht aller Stichtage zum Ausdrucken, sobald Pflichten angelegt sind.</p>
+      </header>
+      <p class="leer">Noch keine Pflichten. Legen Sie im <a href="#/katalog">Katalog</a> fest, was für Ihre Praxis gilt.</p>`;
+  }
+  const reihen = zeilen.map((z) => `
+        <tr class="druck__zeile druck__zeile--${z.status}">
+          <th scope="row">
+            <span class="druck__titel">${esc(z.titel)}</span>
+            <span class="druck__quelle">${esc(z.grundlage)}${z.notiz ? ` · ${esc(z.notiz)}` : ''}</span>
+          </th>
+          <td>${esc(z.takt)}${z.richtwert ? '<span class="druck__richtwert">Richtwert</span>' : ''}</td>
+          <td class="druck__datum">${z.zuletzt || '–'}</td>
+          <td class="druck__datum"><strong>${z.faellig || '–'}</strong></td>
+          <td><span class="druck__stand">${z.stand}</span></td>
+          <td class="druck__frei"></td>
+          <td class="druck__frei"></td>
+        </tr>`).join('');
+  return `
+    <header class="seitenkopf druck__kopf">
+      <h1 tabindex="-1">Stichtage der Praxis</h1>
+      <p>Stand ${stand}: ${esc(druckZusammenfassung(zeilen))}. Die beiden rechten Spalten sind für Ihre Einträge von Hand.</p>
+      <div class="aktionen druck__aktionen">
+        <button class="knopf" type="button" data-drucken>${ICON.drucker}Drucken</button>
+        <a class="knopf knopf--still" href="#/">Zur Übersicht</a>
+      </div>
+    </header>
+    <div class="druck__rahmen" role="region" aria-label="Tabelle der Stichtage" tabindex="0">
+      <table class="druck">
+        <caption class="nur-druck">Stichtage der Praxis, Stand ${stand}. ${esc(druckZusammenfassung(zeilen))}.</caption>
+        <thead>
+          <tr>
+            <th scope="col">Pflicht und Quelle</th>
+            <th scope="col">Takt</th>
+            <th scope="col">Zuletzt</th>
+            <th scope="col">Nächster Stichtag</th>
+            <th scope="col">Stand</th>
+            <th scope="col">Erledigt am</th>
+            <th scope="col">Zeichen</th>
+          </tr>
+        </thead>
+        <tbody>${reihen}
+        </tbody>
+      </table>
+    </div>
+    <p class="druck__fuss">Erstellt mit Stichtag. Eine Gedächtnisstütze ohne Anspruch auf Vollständigkeit, keine Rechtsberatung; maßgeblich sind die genannten Vorschriften. Die Nachweise selbst gehören in Ihr QM-System.</p>`;
 }
 
 // Vom Betreiber vorgegeben. Inhalt nicht ändern (CLAUDE.md, Leitplanke 4).
@@ -407,14 +464,14 @@ function fokusSchluessel(el) {
 function zeichnen({ neueSeite = false, frisch = null } = {}) {
   const r = route();
   const fokus = neueSeite ? null : fokusSchluessel(document.activeElement);
-  const ansichten = { '': ansichtUebersicht, katalog: ansichtKatalog, werdegang: ansichtWerdegang, daten: ansichtDaten, impressum: ansichtImpressum };
+  const ansichten = { '': ansichtUebersicht, katalog: ansichtKatalog, werdegang: ansichtWerdegang, daten: ansichtDaten, impressum: ansichtImpressum, druck: ansichtDruck };
   inhalt.innerHTML = ansichten[r]();
 
   for (const a of document.querySelectorAll('.hauptnav a')) {
     if (a.dataset.route === r) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
-  document.title = { '': 'Stichtag – Pflichtenkalender für die Arztpraxis', katalog: 'Katalog – Stichtag', werdegang: 'Werdegang – Stichtag', daten: 'Daten und Rechtliches – Stichtag', impressum: 'Impressum – Stichtag' }[r];
+  document.title = { '': 'Stichtag – Pflichtenkalender für die Arztpraxis', katalog: 'Katalog – Stichtag', werdegang: 'Werdegang – Stichtag', daten: 'Daten und Rechtliches – Stichtag', impressum: 'Impressum – Stichtag', druck: 'Druckblatt – Stichtag' }[r];
 
   if (neueSeite) {
     window.scrollTo(0, 0);
@@ -465,6 +522,8 @@ inhalt.addEventListener('click', (e) => {
   const d = ziel.dataset;
 
   if (d.startpaket !== undefined) return startpaketLaden();
+
+  if (d.drucken !== undefined) return window.print();
 
   if (d.erledigt !== undefined) {
     const id = d.erledigt;
