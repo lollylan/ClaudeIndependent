@@ -1,6 +1,6 @@
 import { BEREICHE, KATALOG, katalogEintrag } from './katalog.js';
 import * as D from './datum.js';
-import { laden, speichern, normalisieren, ausKatalog, eigenePflicht, leererZustand } from './store.js';
+import { laden, speichern, normalisieren, ausKatalog, eigenePflicht, leererZustand, sicherungsHinweis } from './store.js';
 import { plakette } from './plakette.js';
 import { alsICS } from './ics.js';
 import { druckZeilen, druckZusammenfassung } from './druck.js';
@@ -52,6 +52,7 @@ function angereichert() {
 function aendern(fn, text, { frisch = null } = {}) {
   vorher = structuredClone(zustand);
   fn(zustand);
+  zustand.geaendertAm = D.toISO(D.heute());
   const gespeichert = speichern(zustand);
   zeichnen({ frisch });
   if (!gespeichert) melden('Speichern nicht möglich. Ihr Browser blockiert den lokalen Speicher, etwa im privaten Modus.', false);
@@ -124,6 +125,7 @@ function ansichtUebersicht() {
       </div>
     </section>
     ${jahresband(liste)}
+    ${sicherungsZeile()}
     ${gruppe('Überfällig', ueberfaellig)}
     ${gruppe('In den nächsten 30 Tagen', bald)}
     ${gruppe('Noch ohne Datum', offen, 'Sobald das letzte Datum eingetragen ist, erscheint die Pflicht im Kalender.')}
@@ -173,6 +175,19 @@ function jahresband(liste) {
       </div>
       <p class="band__fuss">Die Linie markiert heute. ${imBand.length === 0 ? 'In diesem Zeitraum liegt noch kein Stichtag.' : 'Ein Klick auf einen Punkt führt zur Pflicht.'}${spaeter ? ` ${spaeter === 1 ? 'Ein weiterer Stichtag liegt' : `${spaeter} weitere Stichtage liegen`} dahinter.` : ''} <a href="#/druck">Als Druckblatt für den QM-Ordner</a></p>
     </section>`;
+}
+
+function sicherungsZeile() {
+  const h = sicherungsHinweis(zustand);
+  if (!h) return '';
+  const text = h.art === 'nie'
+    ? '<strong>Noch keine Sicherung.</strong> Ihre Einträge liegen nur in diesem Browser. Wer die Websitedaten löscht oder den Rechner wechselt, verliert sie.'
+    : `<strong>Letzte Sicherung vom ${D.formatDatum(D.parseISO(h.seit))}.</strong> Seitdem hat sich etwas geändert. Eine neue Sicherungsdatei hält den aktuellen Stand fest.`;
+  return `
+    <aside class="sicherung" aria-label="Sicherung">
+      <p>${text}</p>
+      <button class="knopf knopf--klein knopf--still" type="button" data-export>${ICON.herunter}Sicherung herunterladen</button>
+    </aside>`;
 }
 
 function gruppe(titel, liste, hinweis = '') {
@@ -297,6 +312,9 @@ function ansichtWerdegang() {
 
 function ansichtDaten() {
   const anzahl = zustand.pflichten.length;
+  const gesichert = zustand.gesichertAm
+    ? `Die letzte Sicherung aus diesem Browser stammt vom ${D.formatDatum(D.parseISO(zustand.gesichertAm))}.`
+    : 'Aus diesem Browser wurde noch keine Sicherung heruntergeladen.';
   return `
     <header class="seitenkopf">
       <h1 tabindex="-1">Daten und Rechtliches</h1>
@@ -305,7 +323,7 @@ function ansichtDaten() {
 
     <section class="abschnitt">
       <h2>Sichern und mitnehmen</h2>
-      <p>${anzahl === 0 ? 'Noch sind keine Pflichten angelegt.' : `${anzahl === 1 ? 'Eine Pflicht ist' : `${anzahl} Pflichten sind`} in diesem Browser gespeichert.`} Wer den Browser wechselt oder die Websitedaten löscht, braucht eine Sicherungsdatei.</p>
+      <p>${anzahl === 0 ? 'Noch sind keine Pflichten angelegt.' : `${anzahl === 1 ? 'Eine Pflicht ist' : `${anzahl} Pflichten sind`} in diesem Browser gespeichert.`} Wer den Browser wechselt oder die Websitedaten löscht, braucht eine Sicherungsdatei. ${gesichert} Legen Sie die Datei außerhalb des Browsers ab, etwa im QM-Ordner auf dem Praxisserver.</p>
       <div class="aktionen">
         <button class="knopf" type="button" data-export>${ICON.herunter}Sicherung herunterladen</button>
         <span>
@@ -454,7 +472,7 @@ function ansichtImpressum() {
 
 function fokusSchluessel(el) {
   if (!el || !inhalt.contains(el)) return null;
-  for (const name of ['erledigt', 'details', 'umschalten', 'entfernen']) {
+  for (const name of ['erledigt', 'details', 'umschalten', 'entfernen', 'export']) {
     if (el.dataset[name] !== undefined) return `[data-${name}="${CSS.escape(el.dataset[name])}"]`;
   }
   if (el.dataset.feld) return `[data-feld="${el.dataset.feld}"][data-id="${CSS.escape(el.dataset.id)}"]`;
@@ -558,7 +576,14 @@ inhalt.addEventListener('click', (e) => {
   }
 
   if (d.export !== undefined) {
-    return herunterladen(`stichtag-sicherung-${D.toISO(D.heute())}.json`, JSON.stringify(zustand, null, 2), 'application/json');
+    // Ob die Datei wirklich gespeichert wurde, verrät der Browser nicht; der Klick zählt als Sicherung.
+    zustand.gesichertAm = D.toISO(D.heute());
+    const gespeichert = speichern(zustand);
+    herunterladen(`stichtag-sicherung-${zustand.gesichertAm}.json`, JSON.stringify(zustand, null, 2), 'application/json');
+    zeichnen();
+    // Der Hinweis in der Übersicht verschwindet samt Knopf; der Fokus bleibt dann im Inhalt.
+    if (!inhalt.contains(document.activeElement)) inhalt.focus({ preventScroll: true });
+    return gespeichert ? melden('Sicherung erstellt. Bewahren Sie die Datei außerhalb des Browsers auf.', false) : undefined;
   }
 
   if (d.ics !== undefined) {
@@ -621,7 +646,8 @@ inhalt.addEventListener('change', (e) => {
       let neu;
       try { neu = normalisieren(JSON.parse(String(leser.result))); } catch { neu = null; }
       if (!neu || neu.pflichten.length === 0) return melden('Diese Datei enthält keine lesbare Stichtag-Sicherung.', false);
-      aendern((z) => { Object.assign(z, neu); }, `Sicherung eingespielt: ${neu.pflichten.length} Pflichten.`);
+      // Der eingespielte Stand liegt bereits als Datei vor und gilt deshalb als gesichert.
+      aendern((z) => { Object.assign(z, neu, { gesichertAm: D.toISO(D.heute()) }); }, `Sicherung eingespielt: ${neu.pflichten.length} Pflichten.`);
     };
     leser.onerror = () => melden('Die Datei konnte nicht gelesen werden.', false);
     leser.readAsText(el.files[0]);

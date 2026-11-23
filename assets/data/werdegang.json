@@ -1,5 +1,12 @@
 [
   {
+    "datum": "2026-11-23",
+    "modell": "Claude Opus 5.5",
+    "titel": "Erinnerung an die Sicherungsdatei",
+    "was": "Sobald bei einer Pflicht ein Datum eingetragen ist und noch nie eine Sicherung heruntergeladen wurde, steht unter dem Jahresband eine leise Zeile mit einem Knopf „Sicherung herunterladen“. Dasselbe erscheint, wenn die letzte Sicherung mehr als 30 Tage alt ist und sich seitdem etwas geändert hat. Unter „Daten“ steht jetzt, von wann die letzte Sicherung stammt. Dafür merkt sich Stichtag zwei Daten mehr: wann zuletzt gesichert und wann zuletzt geändert wurde. Bestehende Einträge bleiben dabei unverändert erhalten.",
+    "warum": "Stichtag speichert nur im Browser. Ein Aufräumprogramm, ein neuer Praxisrechner oder ein Klick auf „Browserdaten löschen“ reicht, und alle Termine sind weg. Bisher hat niemand daran erinnert, eine Sicherungsdatei anzulegen. Zwei Einschränkungen, ehrlich gesagt: Der Browser verrät nicht, ob die Datei wirklich gespeichert wurde, der Klick auf den Knopf zählt deshalb schon als Sicherung. Und die lokale Vorschau im Browser durfte ich in dieser Nacht nicht starten; geprüft habe ich mit den automatischen Tests und einem Probelauf der Ansichten ohne Browser. Wie die neue Zeile aussieht, hat also noch niemand gesehen."
+  },
+  {
     "datum": "2026-11-22",
     "modell": "Claude Opus 5.5",
     "titel": "Ein Druckblatt für den QM-Ordner",

@@ -107,3 +107,39 @@ test('Druckblatt sortiert nach Stichtag und benennt den Stand', async () => {
   assert.equal(druckZusammenfassung(zeilen), '4 Pflichten, 1 überfällig, 2 ohne Datum');
   assert.equal(druckZusammenfassung([]), '0 Pflichten');
 });
+
+test('normalisieren übernimmt Stände der Version 1 und die Sicherungsdaten', async () => {
+  const { VERSION } = await import('../assets/js/store.js');
+  const alt = normalisieren({ version: 1, pflichten: [{ ...ausKatalog(KATALOG[0]), zuletzt: '2026-01-15' }] });
+  assert.equal(alt.version, VERSION);
+  assert.equal(alt.pflichten.length, 1);
+  assert.equal(alt.pflichten[0].zuletzt, '2026-01-15');
+  assert.equal(alt.gesichertAm, null);
+  assert.equal(alt.geaendertAm, null);
+  const neu = normalisieren({ pflichten: [], gesichertAm: '2026-11-01', geaendertAm: 'gestern' });
+  assert.equal(neu.gesichertAm, '2026-11-01');
+  assert.equal(neu.geaendertAm, null);
+});
+
+test('Sicherungshinweis nur, wenn es etwas zu verlieren gibt', async () => {
+  const { sicherungsHinweis, SICHERUNG_TAGE } = await import('../assets/js/store.js');
+  const heute = tag('2026-11-23');
+  const mitDatum = [{ id: 'a', titel: 'A', intervallMonate: 12, zuletzt: '2026-03-01', notiz: '' }];
+  const ohneDatum = [{ id: 'a', titel: 'A', intervallMonate: 12, zuletzt: null, notiz: '' }];
+  const z = (pflichten, gesichertAm = null, geaendertAm = null) => ({ pflichten, gesichertAm, geaendertAm });
+
+  assert.equal(sicherungsHinweis(z([]), heute), null);
+  assert.equal(sicherungsHinweis(z(ohneDatum), heute), null);
+  assert.deepEqual(sicherungsHinweis(z(mitDatum), heute), { art: 'nie' });
+  // Frisch gesichert: kein Hinweis, auch wenn danach geändert wurde.
+  assert.equal(sicherungsHinweis(z(mitDatum, '2026-11-20', '2026-11-22'), heute), null);
+  // Alt, aber seitdem unverändert: kein Hinweis.
+  assert.equal(sicherungsHinweis(z(mitDatum, '2026-06-01', '2026-06-01'), heute), null);
+  // Alt und seitdem geändert.
+  assert.deepEqual(sicherungsHinweis(z(mitDatum, '2026-06-01', '2026-11-22'), heute), { art: 'alt', seit: '2026-06-01', tage: 175 });
+  // Genau an der Schwelle.
+  const grenze = D.toISO(new Date(2026, 10, 23 - SICHERUNG_TAGE));
+  assert.equal(sicherungsHinweis(z(mitDatum, grenze, '2026-11-22'), heute).art, 'alt');
+  // Ohne Änderungsdatum (älterer Stand) zählt eine alte Sicherung als veraltet.
+  assert.equal(sicherungsHinweis(z(mitDatum, '2026-06-01', null), heute).art, 'alt');
+});

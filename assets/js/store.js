@@ -1,14 +1,19 @@
 // Speicherung ausschließlich im localStorage dieses Browsers.
 // Es gibt keinen Server und keine Netzwerkübertragung der Nutzerdaten.
 
-import { istISO } from './datum.js';
+import { istISO, parseISO, tageBis, heute } from './datum.js';
 import { katalogEintrag } from './katalog.js';
 
 const SCHLUESSEL = 'stichtag.v1';
-export const VERSION = 1;
+// Version 2: gesichertAm und geaendertAm für den Hinweis auf eine fällige Sicherung.
+// Ältere Stände haben beides nicht und bekommen null; die Pflichten bleiben unverändert.
+export const VERSION = 2;
+
+// Ab so vielen Tagen seit der letzten Sicherung erinnert Stichtag, sofern sich seitdem etwas geändert hat.
+export const SICHERUNG_TAGE = 30;
 
 export function leererZustand() {
-  return { version: VERSION, pflichten: [] };
+  return { version: VERSION, pflichten: [], gesichertAm: null, geaendertAm: null };
 }
 
 // Bringt beliebige Eingaben (alter Speicherstand, importierte Datei) in die
@@ -16,6 +21,8 @@ export function leererZustand() {
 export function normalisieren(roh) {
   const z = leererZustand();
   if (!roh || typeof roh !== 'object' || !Array.isArray(roh.pflichten)) return z;
+  z.gesichertAm = istISO(roh.gesichertAm) ? roh.gesichertAm : null;
+  z.geaendertAm = istISO(roh.geaendertAm) ? roh.geaendertAm : null;
   const gesehen = new Set();
   for (const p of roh.pflichten) {
     if (!p || typeof p !== 'object') continue;
@@ -36,6 +43,18 @@ export function normalisieren(roh) {
     });
   }
   return z;
+}
+
+// Soll Stichtag an eine Sicherungsdatei erinnern? Nur wenn es etwas zu verlieren gibt,
+// also mindestens ein eingetragenes Datum. Ergebnis: null, { art: 'nie' } oder
+// { art: 'alt', seit: 'JJJJ-MM-TT', tage: n }.
+export function sicherungsHinweis(zustand, stichtag = heute()) {
+  if (!zustand.pflichten.some((p) => p.zuletzt)) return null;
+  if (!zustand.gesichertAm) return { art: 'nie' };
+  const tage = tageBis(parseISO(zustand.gesichertAm), stichtag);
+  const geaendert = !zustand.geaendertAm || zustand.geaendertAm > zustand.gesichertAm;
+  if (geaendert && tage >= SICHERUNG_TAGE) return { art: 'alt', seit: zustand.gesichertAm, tage };
+  return null;
 }
 
 export function laden() {

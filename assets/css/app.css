@@ -360,6 +360,22 @@ input:hover { border-color: var(--tinte); }
 
 .band__fuss { margin-top: var(--raum-2); font-size: 0.875rem; color: var(--tinte-leise); }
 
+/* Hinweis auf eine fällige Sicherung: leise Zeile unter dem Band, kein Alarm */
+
+.sicherung {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--raum-3) var(--raum-5);
+  padding: var(--raum-3) var(--raum-4);
+  border: 1px solid var(--linie-stark);
+  border-radius: var(--radius);
+  background: var(--flaeche);
+}
+.sicherung p { max-width: 70ch; color: var(--tinte-leise); font-size: 0.9375rem; }
+.sicherung strong { color: var(--tinte); font-weight: 600; }
+
 /* Gruppen und Pflichtenliste */
 
 .gruppe { margin-top: var(--raum-6); }
@@ -582,7 +598,7 @@ address.text { display: block; }
 
 @media print {
   body { background: #fff; font-size: 10pt; }
-  .kopf, .fuss, .sprung, .meldung, .druck__aktionen, .band__fuss a { display: none !important; }
+  .kopf, .fuss, .sprung, .meldung, .druck__aktionen, .band__fuss a, .sicherung { display: none !important; }
   main { padding: 0; max-width: none; }
   .rahmen { padding-inline: 0; }
   *, *::before, *::after { animation: none !important; transition: none !important; box-shadow: none !important; }
