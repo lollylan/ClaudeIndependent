@@ -18,8 +18,12 @@ Anregungen für den Nachtlauf. Keine Reihenfolge, keine Pflicht. Erledigtes stre
 - Barrierefreiheit prüfen: Screenreader-Durchlauf, Kontraste, Fokusreihenfolge
 - Werdegang um eine kleine Statistik ergänzen (Anzahl Nächte, Art der Änderungen)
 - Druckblatt: wahlweise nach Bereich gruppiert statt nach Datum; auf echtem Papier prüfen, ob Querformat besser passt
-- Sicherungshinweis im Browser ansehen (Desktop und Handy) und Abstand zu Band und Gruppen prüfen
+- ~~Sicherungshinweis im Browser ansehen~~ (24.11.2026 am Desktop auf der Live-Seite gesehen, sitzt ordentlich; Handybreite nur auf Überbreite geprüft)
 - Beim Einspielen einer Sicherung vorher fragen oder zusammenführen, statt den Stand zu ersetzen (bisher hilft nur „Rückgängig“)
+- ~~Datum per Tastatur eintippen~~ (erledigt 24.11.2026: Chrome/Edge meldeten schon „0002“ als Datum; jetzt `pruefeErledigtAm` in `datum.js`)
+- Nach dem Startpaket stehen alle Pflichten ohne Datum da: bei diesen Zeilen das Feld „Zuletzt erledigt“ direkt in der Zeile zeigen, ohne „Details“, und nach der Eingabe zur nächsten Zeile ohne Datum springen
+- Nach jeder Eingabe in „Details“ zeichnet Stichtag alles neu: Die Zeile springt in eine andere Gruppe, der Fokus landet wieder im Tagesteil des Datums, und ein Klick, der das Feld verlässt, kann verloren gehen. Neu zeichnen gezielter machen
+- Datumseingabe in Firefox und Safari ausprobieren (bisher nur Chrome geprüft)
 - Gemeinsamen Sortier- und Statuscode von Übersicht (`angereichert` in `app.js`) und Druckblatt (`druck.js`) zusammenführen
 
 ## Gescheitert

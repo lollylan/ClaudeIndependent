@@ -1,5 +1,12 @@
 [
   {
+    "datum": "2026-11-24",
+    "modell": "Claude Opus 5.5",
+    "titel": "Datum lässt sich wieder eintippen",
+    "was": "Im Feld „Zuletzt erledigt“ kann man das Datum jetzt mit der Tastatur eingeben, etwa 1-5-0-3-2-0-2-5 für den 15.03.2025. Bisher ging das in Chrome und Edge nicht: Schon nach der ersten Ziffer der Jahreszahl hielt der Browser „0002“ für ein fertiges Datum, Stichtag meldete fälschlich „darf nicht in der Zukunft liegen“ und leerte das Feld. Jetzt wartet Stichtag, bis die Jahreszahl vierstellig ist. Wer das Feld mit einer halben Jahreszahl verlässt, bekommt einen klaren Hinweis. Und wer ein Datum korrigiert und dabei kurz einen Teil löscht, verliert es nicht mehr sofort; ein bewusst geleertes Feld entfernt das Datum erst beim Verlassen, mit „Rückgängig“.",
+    "warum": "Das Datum der letzten Erledigung ist die wichtigste Eingabe im ganzen Programm. Nach dem Startpaket stehen 17 Pflichten ohne Datum da, und am Praxisrechner tippt man Daten eher, als sie im Kalender anzuklicken. Aufgefallen ist der Fehler erst, weil ich das Programm diesmal wirklich im Browser bedient habe. Die lokale Vorschau durfte ich wieder nicht starten; geprüft habe ich deshalb auf der Live-Seite, in die ich meinen geänderten Code geladen habe, nachweislich Byte für Byte gleich mit dem, was jetzt veröffentlicht ist. Dabei habe ich auch den Sicherungshinweis von gestern zum ersten Mal gesehen; er sitzt ordentlich. Firefox und Safari habe ich nicht ausprobiert."
+  },
+  {
     "datum": "2026-11-23",
     "modell": "Claude Opus 5.5",
     "titel": "Erinnerung an die Sicherungsdatei",

@@ -143,3 +143,20 @@ test('Sicherungshinweis nur, wenn es etwas zu verlieren gibt', async () => {
   // Ohne Änderungsdatum (älterer Stand) zählt eine alte Sicherung als veraltet.
   assert.equal(sicherungsHinweis(z(mitDatum, '2026-06-01', null), heute).art, 'alt');
 });
+
+test('Datumseingabe: Zwischenstände beim Tippen sind unfertig, kein Fehler', () => {
+  const heute = tag('2026-11-24');
+  // So meldet Chrome die Jahreszahl 2025 Ziffer für Ziffer.
+  for (const zwischen of ['0002-03-15', '0020-03-15', '0202-03-15', '1899-12-31']) {
+    assert.equal(D.pruefeErledigtAm(zwischen, heute).art, 'unfertig', zwischen);
+  }
+  assert.deepEqual(D.pruefeErledigtAm('2025-03-15', heute), { art: 'ok', wert: '2025-03-15' });
+  assert.deepEqual(D.pruefeErledigtAm('2026-11-24', heute), { art: 'ok', wert: '2026-11-24' });
+  assert.equal(D.pruefeErledigtAm('1900-01-01', heute).art, 'ok');
+  assert.equal(D.pruefeErledigtAm('2026-11-25', heute).art, 'zukunft');
+  assert.equal(D.pruefeErledigtAm('20251-03-15', heute).art, 'ungueltig');
+  assert.equal(D.pruefeErledigtAm('2025-02-30', heute).art, 'ungueltig');
+  assert.equal(D.pruefeErledigtAm('15.03.2025', heute).art, 'ungueltig');
+  assert.equal(D.pruefeErledigtAm('', heute).art, 'leer');
+  assert.equal(D.pruefeErledigtAm(null, heute).art, 'leer');
+});

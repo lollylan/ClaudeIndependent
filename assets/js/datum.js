@@ -41,6 +41,25 @@ export function tageBis(von, bis) {
   return Math.round((b - a) / 86400000);
 }
 
+// Jahre davor gelten als noch nicht fertig getippt (siehe pruefeErledigtAm).
+export const FRUEHESTES_JAHR = 1900;
+
+// Prüft den Wert eines Datumsfelds für „zuletzt erledigt“.
+// Chrome und Edge melden beim Tippen schon nach der ersten Jahresziffer ein
+// vollständiges Datum („0002-03-15“), dann „0020-…“, „0202-…“ und erst zuletzt
+// „2025-…“. Solche Zwischenstände sind 'unfertig' und dürfen weder gespeichert
+// noch als Fehler gemeldet werden.
+// Ergebnis: { art: 'leer' | 'ok' | 'unfertig' | 'zukunft' | 'ungueltig', wert? }
+export function pruefeErledigtAm(wert, stichtag = heute()) {
+  if (wert === '' || wert === null || wert === undefined) return { art: 'leer' };
+  const m = /^(\d{4,6})-\d{2}-\d{2}$/.exec(String(wert));
+  if (!m) return { art: 'ungueltig' };
+  if (Number(m[1]) < FRUEHESTES_JAHR) return { art: 'unfertig' };
+  if (!istISO(wert)) return { art: 'ungueltig' };
+  if (parseISO(wert) > stichtag) return { art: 'zukunft' };
+  return { art: 'ok', wert };
+}
+
 export function faelligAm(pflicht) {
   if (!pflicht.zuletzt) return null;
   return addMonate(parseISO(pflicht.zuletzt), pflicht.intervallMonate);

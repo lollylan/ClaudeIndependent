@@ -618,13 +618,19 @@ inhalt.addEventListener('change', (e) => {
     const p = zustand.pflichten.find((x) => x.id === id);
     if (!p) return;
     if (feld === 'zuletzt') {
-      const wert = el.value;
-      if (wert && (!D.istISO(wert) || D.parseISO(wert) > D.heute())) {
-        melden('Das Datum der letzten Erledigung darf nicht in der Zukunft liegen.', false);
+      const pruefung = D.pruefeErledigtAm(el.value);
+      // Das Jahr wird noch getippt: nichts speichern, nichts neu zeichnen, sonst ginge die Eingabe verloren.
+      // Leer ist das Feld auch, wenn jemand ein Datum korrigiert und gerade einen Teil gelöscht hat.
+      // Entfernt wird das Datum deshalb erst beim Verlassen des Felds (siehe focusout).
+      if (pruefung.art === 'unfertig' || (pruefung.art === 'leer' && p.zuletzt)) return;
+      if (pruefung.art === 'zukunft' || pruefung.art === 'ungueltig') {
+        melden(pruefung.art === 'zukunft' ? 'Das Datum der letzten Erledigung darf nicht in der Zukunft liegen.' : 'Bitte geben Sie ein gültiges Datum ein.', false);
         el.value = p.zuletzt ?? '';
         return;
       }
-      return aendern((z) => { z.pflichten.find((x) => x.id === id).zuletzt = wert || null; }, '', { frisch: id });
+      const wert = pruefung.art === 'ok' ? pruefung.wert : null;
+      if (wert === p.zuletzt) return;
+      return aendern((z) => { z.pflichten.find((x) => x.id === id).zuletzt = wert; }, '', { frisch: id });
     }
     if (feld === 'intervallMonate') {
       const n = Math.round(Number(el.value));
@@ -651,6 +657,23 @@ inhalt.addEventListener('change', (e) => {
     };
     leser.onerror = () => melden('Die Datei konnte nicht gelesen werden.', false);
     leser.readAsText(el.files[0]);
+  }
+});
+
+// Beim Verlassen des Datumsfelds: Eine halb getippte Jahreszahl bekommt einen Hinweis statt
+// stillschweigend verworfen zu werden; ein geleertes Feld entfernt das Datum (mit „Rückgängig“).
+inhalt.addEventListener('focusout', (e) => {
+  const el = e.target;
+  if (el.dataset?.feld !== 'zuletzt' || !el.isConnected) return;
+  const id = el.dataset.id;
+  const p = zustand.pflichten.find((x) => x.id === id);
+  if (!p) return;
+  const art = D.pruefeErledigtAm(el.value).art;
+  if (art === 'unfertig') {
+    el.value = p.zuletzt ?? '';
+    melden('Bitte geben Sie das Jahr vierstellig ein, etwa 2025. Das Datum wurde nicht übernommen.', false);
+  } else if (art === 'leer' && p.zuletzt) {
+    aendern((z) => { z.pflichten.find((x) => x.id === id).zuletzt = null; }, 'Datum entfernt.');
   }
 });
 
