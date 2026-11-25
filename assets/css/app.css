@@ -415,6 +415,11 @@ input:hover { border-color: var(--tinte); }
 .pflicht--ueberfaellig .pflicht__termin span { color: var(--rot-text); font-weight: 500; }
 .pflicht--bald .pflicht__termin span { color: var(--gelb-text); font-weight: 500; }
 
+/* Ohne Datum: Eingabefeld statt Termin, damit niemand erst „Details“ suchen muss. */
+.pflicht__eintrag { gap: 0.125rem; }
+.pflicht__eintrag span { font-size: 0.875rem; font-weight: 500; }
+.pflicht__eintrag input[type='date'] { inline-size: 10.5rem; min-height: 2.25rem; padding-inline: var(--raum-2); }
+
 .pflicht__aktionen { display: flex; gap: var(--raum-2); }
 
 .pflicht__details {

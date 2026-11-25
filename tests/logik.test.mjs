@@ -160,3 +160,14 @@ test('Datumseingabe: Zwischenstände beim Tippen sind unfertig, kein Fehler', ()
   assert.equal(D.pruefeErledigtAm('', heute).art, 'leer');
   assert.equal(D.pruefeErledigtAm(null, heute).art, 'leer');
 });
+
+test('Eingabe in der Zeile: Meldungssatz und nächste Zeile ohne Datum', () => {
+  const heute = tag('2026-11-25');
+  assert.equal(D.stichtagSatz({ zuletzt: '2026-03-15', intervallMonate: 12 }, heute), 'Nächster Stichtag: 15.03.2027, in 4 Monaten.');
+  assert.equal(D.stichtagSatz({ zuletzt: '2025-01-10', intervallMonate: 12 }, heute), 'Nächster Stichtag: 10.01.2026, seit 10 Monaten überfällig.');
+  assert.equal(D.stichtagSatz({ zuletzt: null, intervallMonate: 12 }, heute), '');
+  assert.equal(D.nachfolger(['a', 'b', 'c'], 'a'), 'b');
+  assert.equal(D.nachfolger(['a', 'b', 'c'], 'c'), 'b');
+  assert.equal(D.nachfolger(['a'], 'a'), null);
+  assert.equal(D.nachfolger(['a', 'b'], 'x'), null);
+});

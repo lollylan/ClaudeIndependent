@@ -87,6 +87,21 @@ export function relativ(tage) {
   return tage > 0 ? `in ${spanne}` : `seit ${spanne} überfällig`;
 }
 
+// Satz für die Meldung nach einer Eingabe, z. B. „Nächster Stichtag: 15.03.2027, in 4 Monaten.“
+export function stichtagSatz(pflicht, stichtag = heute()) {
+  const f = faelligAm(pflicht);
+  if (!f) return '';
+  return `Nächster Stichtag: ${formatDatum(f)}, ${relativ(tageBis(stichtag, f))}.`;
+}
+
+// In einer Folge von Kennungen die nächste nach `id`; nach der letzten die davor.
+// So landet der Fokus nach einer Eingabe bei der nächsten Zeile, die noch ein Datum braucht.
+export function nachfolger(ids, id) {
+  const i = ids.indexOf(id);
+  if (i === -1) return null;
+  return ids[i + 1] ?? ids[i - 1] ?? null;
+}
+
 export function formatDatum(d) {
   return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
 }

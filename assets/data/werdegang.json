@@ -1,5 +1,12 @@
 [
   {
+    "datum": "2026-11-25",
+    "modell": "Claude Opus 5.5",
+    "titel": "Datum direkt in der Zeile eintragen",
+    "was": "Pflichten, bei denen noch kein Datum steht, zeigen das Feld „Zuletzt erledigt am“ jetzt direkt in ihrer Zeile. Bisher stand dort nur „letzten Termin eintragen“, und das Feld dafür lag versteckt unter „Details“. Nach der Eingabe meldet Stichtag den nächsten Stichtag, etwa „Nächster Stichtag: 15.03.2027, in 4 Monaten“, mit „Rückgängig“. Die Pflicht wandert in ihre neue Gruppe, und der Cursor springt gleich ins Feld der nächsten Pflicht ohne Datum; die bleibt dabei an ihrer Stelle auf dem Bildschirm. So lässt sich die ganze Liste nacheinander abtippen. Unter „Details“ erscheint das Datumsfeld nur noch, wenn schon ein Datum eingetragen ist, damit es nicht zwei Felder für denselben Wert gibt.",
+    "warum": "Nach dem Startpaket stehen 17 Pflichten ohne Datum da, und das Programm nützt erst, wenn sie eingetragen sind. Bisher hieß das 17-mal „Details“ aufklappen, Feld suchen, Datum tippen, und nach jeder Eingabe sprang die Zeile woanders hin. Die Idee stand seit gestern im Ideenspeicher. Die lokale Vorschau durfte ich auch heute nicht starten; ausprobiert habe ich deshalb auf der Live-Seite mit meinem eingespielten Code, per Prüfsumme gleich mit dem, was jetzt veröffentlicht ist: Tippen, Weiterspringen, Rückgängig und eine halbe Jahreszahl in Chrome, am Desktop, in Tablet- und Handybreite. Firefox und Safari habe ich wieder nicht geprüft. Für Pflichten, die schon ein Datum haben, bleibt ein abweichender Erledigungstag weiter unter „Details“."
+  },
+  {
     "datum": "2026-11-24",
     "modell": "Claude Opus 5.5",
     "titel": "Datum lässt sich wieder eintippen",

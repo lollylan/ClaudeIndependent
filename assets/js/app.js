@@ -205,10 +205,13 @@ function pflichtZeile(p) {
   const k = p.katalog;
   const unterzeile = [k ? esc(k.grundlage) : 'Eigene Pflicht', D.intervallText(p.intervallMonate)].join(' · ');
   const richtwert = k && k.richtwert && k.intervallMonate === p.intervallMonate ? ' <span class="marke-richtwert">Richtwert</span>' : '';
-  const termin = p.faellig
-    ? `<strong>${D.formatDatum(p.faellig)}</strong><span>${D.relativ(p.tage)}</span>`
-    : '<strong>Noch kein Datum</strong><span>letzten Termin eintragen</span>';
   const heuteISO = D.toISO(D.heute());
+  // Ohne Datum steht das Feld gleich in der Zeile: Nach dem Startpaket ist das die erste Arbeit.
+  const termin = p.faellig
+    ? `<div class="pflicht__termin"><strong>${D.formatDatum(p.faellig)}</strong><span>${D.relativ(p.tage)}</span></div>`
+    : `<label class="pflicht__termin pflicht__eintrag"><span aria-hidden="true">Zuletzt erledigt am</span>
+          <input type="date" max="${heuteISO}" data-feld="zuletzt" data-ort="zeile" data-id="${esc(p.id)}" aria-label="${esc(p.titel)}: zuletzt erledigt am">
+        </label>`;
 
   return `
     <li class="pflicht pflicht--${p.status}" id="p-${esc(p.id)}">
@@ -218,7 +221,7 @@ function pflichtZeile(p) {
           <h3>${esc(p.titel)}</h3>
           <p>${unterzeile}${richtwert}</p>
         </div>
-        <div class="pflicht__termin">${termin}</div>
+        ${termin}
         <div class="pflicht__aktionen">
           <button class="knopf knopf--klein" type="button" data-erledigt="${esc(p.id)}">${ICON.haken}Heute erledigt</button>
           <button class="knopf knopf--klein knopf--still" type="button" data-details="${esc(p.id)}" aria-expanded="${offen}" aria-controls="d-${esc(p.id)}">Details</button>
@@ -226,9 +229,9 @@ function pflichtZeile(p) {
       </div>
       <div class="pflicht__details" id="d-${esc(p.id)}"${offen ? '' : ' hidden'}>
         ${k ? `<p class="pflicht__hinweis"><strong>${esc(k.grundlage)}.</strong> ${esc(k.hinweis)}</p>` : ''}
-        <label class="feld">Zuletzt erledigt
-          <input type="date" value="${p.zuletzt ?? ''}" max="${heuteISO}" data-feld="zuletzt" data-id="${esc(p.id)}">
-        </label>
+        ${p.zuletzt ? `<label class="feld">Zuletzt erledigt
+          <input type="date" value="${p.zuletzt}" max="${heuteISO}" data-feld="zuletzt" data-id="${esc(p.id)}">
+        </label>` : ''}
         <label class="feld">Intervall in Monaten
           <input type="number" inputmode="numeric" min="1" max="240" step="1" value="${p.intervallMonate}" data-feld="intervallMonate" data-id="${esc(p.id)}">
         </label>
@@ -630,7 +633,27 @@ inhalt.addEventListener('change', (e) => {
       }
       const wert = pruefung.art === 'ok' ? pruefung.wert : null;
       if (wert === p.zuletzt) return;
-      return aendern((z) => { z.pflichten.find((x) => x.id === id).zuletzt = wert; }, '', { frisch: id });
+      if (el.dataset.ort !== 'zeile') {
+        return aendern((z) => { z.pflichten.find((x) => x.id === id).zuletzt = wert; }, '', { frisch: id });
+      }
+      // Eingabe direkt in der Zeile: Die Zeile wandert in ihre neue Gruppe, der Fokus geht zur
+      // nächsten Zeile ohne Datum, und die bleibt dabei an ihrer Stelle auf dem Bildschirm.
+      const zeilenFelder = () => [...inhalt.querySelectorAll('[data-ort="zeile"]')];
+      const weiterId = D.nachfolger(zeilenFelder().map((f) => f.dataset.id), id);
+      const vorTop = weiterId ? zeilenFelder().find((f) => f.dataset.id === weiterId).getBoundingClientRect().top : 0;
+      aendern((z) => { z.pflichten.find((x) => x.id === id).zuletzt = wert; },
+        `„${p.titel}“ eingetragen. ${D.stichtagSatz({ ...p, zuletzt: wert })}`, { frisch: id });
+      const weiter = weiterId && zeilenFelder().find((f) => f.dataset.id === weiterId);
+      if (weiter) {
+        window.scrollBy(0, weiter.getBoundingClientRect().top - vorTop);
+        weiter.focus({ preventScroll: true });
+      } else {
+        // Alle Daten eingetragen: Fokus zur eben bearbeiteten Zeile.
+        const zeile = document.getElementById(`p-${id}`);
+        zeile?.scrollIntoView({ block: 'center' });
+        zeile?.querySelector('[data-details]')?.focus({ preventScroll: true });
+      }
+      return;
     }
     if (feld === 'intervallMonate') {
       const n = Math.round(Number(el.value));
