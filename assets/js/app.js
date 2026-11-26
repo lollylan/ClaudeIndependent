@@ -1,6 +1,6 @@
 import { BEREICHE, KATALOG, katalogEintrag } from './katalog.js';
 import * as D from './datum.js';
-import { laden, speichern, normalisieren, ausKatalog, eigenePflicht, leererZustand, sicherungsHinweis } from './store.js';
+import { laden, speichern, normalisieren, ausKatalog, eigenePflicht, weiteresExemplar, leererZustand, sicherungsHinweis } from './store.js';
 import { plakette } from './plakette.js';
 import { alsICS } from './ics.js';
 import { druckZeilen, druckZusammenfassung } from './druck.js';
@@ -229,6 +229,9 @@ function pflichtZeile(p) {
       </div>
       <div class="pflicht__details" id="d-${esc(p.id)}"${offen ? '' : ' hidden'}>
         ${k ? `<p class="pflicht__hinweis"><strong>${esc(k.grundlage)}.</strong> ${esc(k.hinweis)}</p>` : ''}
+        <label class="feld feld--breit">Bezeichnung <small>Etwa Gerät oder Raum, keine Namen</small>
+          <input type="text" maxlength="120" value="${esc(p.titel)}" data-feld="titel" data-id="${esc(p.id)}">
+        </label>
         ${p.zuletzt ? `<label class="feld">Zuletzt erledigt
           <input type="date" value="${p.zuletzt}" max="${heuteISO}" data-feld="zuletzt" data-id="${esc(p.id)}">
         </label>` : ''}
@@ -239,6 +242,7 @@ function pflichtZeile(p) {
           <input type="text" maxlength="500" value="${esc(p.notiz)}" placeholder="z. B. Prüffirma, Raum, Gerät" data-feld="notiz" data-id="${esc(p.id)}">
         </label>
         <div class="aktionen">
+          <button class="knopf knopf--klein knopf--still" type="button" data-exemplar="${esc(p.id)}">${ICON.plus}Weiteres Exemplar</button>
           <button class="knopf knopf--klein knopf--gefahr" type="button" data-entfernen="${esc(p.id)}">Aus meiner Liste entfernen</button>
         </div>
       </div>
@@ -246,15 +250,16 @@ function pflichtZeile(p) {
 }
 
 function ansichtKatalog() {
-  const aktiv = new Set(zustand.pflichten.map((p) => p.katalogId).filter(Boolean));
+  const anzahl = new Map();
+  for (const p of zustand.pflichten) if (p.katalogId) anzahl.set(p.katalogId, (anzahl.get(p.katalogId) || 0) + 1);
   const bereiche = BEREICHE.map((b) => {
     const eintraege = KATALOG.filter((k) => k.bereich === b.id).map((k) => `
       <li>
         <label class="eintrag">
-          <input class="schalter" type="checkbox" role="switch" data-umschalten="${k.id}"${aktiv.has(k.id) ? ' checked' : ''}>
+          <input class="schalter" type="checkbox" role="switch" data-umschalten="${k.id}"${anzahl.has(k.id) ? ' checked' : ''}>
           <span>
             <span class="eintrag__titel">${esc(k.titel)}</span>
-            <span class="eintrag__text">${esc(k.grundlage)}. ${esc(k.hinweis)}</span>
+            <span class="eintrag__text">${esc(k.grundlage)}. ${esc(k.hinweis)}${anzahl.get(k.id) > 1 ? ` <strong>${zahlwort(anzahl.get(k.id))} Exemplare in Ihrer Liste.</strong>` : ''}</span>
           </span>
           <span class="eintrag__takt">${D.intervallText(k.intervallMonate)}${k.richtwert ? '<span class="marke-richtwert">Richtwert</span>' : ''}</span>
         </label>
@@ -265,7 +270,7 @@ function ansichtKatalog() {
   return `
     <header class="seitenkopf">
       <h1 tabindex="-1">Was gilt für Ihre Praxis?</h1>
-      <p>Schalten Sie ein, was auf Sie zutrifft. „Richtwert“ heißt: Die Quelle verlangt Regelmäßigkeit, nennt aber kein festes Intervall. Jedes Intervall lässt sich später anpassen.</p>
+      <p>Schalten Sie ein, was auf Sie zutrifft. „Richtwert“ heißt: Die Quelle verlangt Regelmäßigkeit, nennt aber kein festes Intervall. Jedes Intervall lässt sich später anpassen. Gibt es ein Gerät mehrfach, legen Sie in der Übersicht unter „Details“ ein weiteres Exemplar an.</p>
       <div class="aktionen" style="margin-top:var(--raum-5)">
         <button class="knopf" type="button" data-startpaket>${ICON.plus}Typische Hausarztpraxis laden</button>
         <a class="knopf knopf--still" href="#/">Zur Übersicht</a>
@@ -475,7 +480,7 @@ function ansichtImpressum() {
 
 function fokusSchluessel(el) {
   if (!el || !inhalt.contains(el)) return null;
-  for (const name of ['erledigt', 'details', 'umschalten', 'entfernen', 'export']) {
+  for (const name of ['erledigt', 'details', 'exemplar', 'umschalten', 'entfernen', 'export']) {
     if (el.dataset[name] !== undefined) return `[data-${name}="${CSS.escape(el.dataset[name])}"]`;
   }
   if (el.dataset.feld) return `[data-feld="${el.dataset.feld}"][data-id="${CSS.escape(el.dataset.id)}"]`;
@@ -528,7 +533,8 @@ function herunterladen(dateiname, inhaltText, typ) {
 }
 
 function startpaketLaden() {
-  const vorhanden = new Set(zustand.pflichten.map((p) => p.id));
+  // Nach Katalogbezug, nicht nach id: Wer nur noch ein weiteres Exemplar hat, bekommt kein Duplikat.
+  const vorhanden = new Set(zustand.pflichten.map((p) => p.katalogId).filter(Boolean));
   const neu = KATALOG.filter((k) => k.starter && !vorhanden.has(k.id));
   if (neu.length === 0) return melden('Das Startpaket ist bereits vollständig in Ihrer Liste.', false);
   aendern((z) => { z.pflichten.push(...neu.map(ausKatalog)); }, `${neu.length} Pflichten hinzugefügt.`);
@@ -561,6 +567,20 @@ inhalt.addEventListener('click', (e) => {
     if (aufgeklappt.has(d.details)) aufgeklappt.delete(d.details);
     else aufgeklappt.add(d.details);
     return zeichnen();
+  }
+
+  if (d.exemplar !== undefined) {
+    const neu = weiteresExemplar(zustand.pflichten, d.exemplar);
+    if (!neu) return;
+    aufgeklappt.add(neu.id);
+    aendern((z) => { z.pflichten.push(neu); },
+      `„${neu.titel}“ angelegt. Passen Sie die Bezeichnung an und tragen Sie das letzte Datum ein.`, { frisch: neu.id });
+    // Die neue Zeile steht unter „Noch ohne Datum“, mit offenen Details: gleich die Bezeichnung anpassen.
+    document.getElementById(`p-${neu.id}`)?.scrollIntoView({ block: 'center' });
+    const feld = inhalt.querySelector(`[data-feld="titel"][data-id="${CSS.escape(neu.id)}"]`);
+    feld?.focus({ preventScroll: true });
+    feld?.select();
+    return;
   }
 
   if (d.entfernen !== undefined) {
@@ -605,6 +625,13 @@ inhalt.addEventListener('click', (e) => {
   }
 });
 
+// Textfelder melden „change“ beim Verlassen, bevor der Fokus im nächsten Feld angekommen ist.
+// Würde sofort neu gezeichnet, ginge der Fokus verloren und landete auf der Seite. Deshalb erst
+// zeichnen, wenn der Browser den Fokus weitergegeben hat; zeichnen() stellt ihn dann wieder her.
+function nachFokuswechsel(fn) {
+  setTimeout(fn, 0);
+}
+
 inhalt.addEventListener('change', (e) => {
   const el = e.target;
 
@@ -612,8 +639,10 @@ inhalt.addEventListener('change', (e) => {
     const k = katalogEintrag(el.dataset.umschalten);
     if (!k) return;
     if (el.checked) return aendern((z) => { z.pflichten.push(ausKatalog(k)); }, '');
-    const hatDaten = zustand.pflichten.some((p) => p.katalogId === k.id && (p.zuletzt || p.notiz));
-    return aendern((z) => { z.pflichten = z.pflichten.filter((p) => p.katalogId !== k.id); }, hatDaten ? 'Pflicht samt Datum entfernt.' : '');
+    const betroffen = zustand.pflichten.filter((p) => p.katalogId === k.id);
+    const hatDaten = betroffen.some((p) => p.zuletzt || p.notiz);
+    const text = betroffen.length > 1 ? `${zahlwort(betroffen.length)} Exemplare entfernt.` : hatDaten ? 'Pflicht samt Datum entfernt.' : '';
+    return aendern((z) => { z.pflichten = z.pflichten.filter((p) => p.katalogId !== k.id); }, text);
   }
 
   if (el.dataset.feld) {
@@ -662,10 +691,21 @@ inhalt.addEventListener('change', (e) => {
         el.value = p.intervallMonate;
         return;
       }
-      return aendern((z) => { z.pflichten.find((x) => x.id === id).intervallMonate = n; }, '');
+      return nachFokuswechsel(() => aendern((z) => { z.pflichten.find((x) => x.id === id).intervallMonate = n; }, ''));
+    }
+    if (feld === 'titel') {
+      const titel = el.value.trim().slice(0, 120);
+      if (!titel) {
+        melden('Die Bezeichnung darf nicht leer sein.', false);
+        el.value = p.titel;
+        return;
+      }
+      if (titel === p.titel) return;
+      return nachFokuswechsel(() => aendern((z) => { z.pflichten.find((x) => x.id === id).titel = titel; }, ''));
     }
     if (feld === 'notiz') {
-      return aendern((z) => { z.pflichten.find((x) => x.id === id).notiz = el.value.trim().slice(0, 500); }, '');
+      const notiz = el.value.trim().slice(0, 500);
+      return nachFokuswechsel(() => aendern((z) => { z.pflichten.find((x) => x.id === id).notiz = notiz; }, ''));
     }
   }
 

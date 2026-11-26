@@ -171,3 +171,38 @@ test('Eingabe in der Zeile: Meldungssatz und nächste Zeile ohne Datum', () => {
   assert.equal(D.nachfolger(['a'], 'a'), null);
   assert.equal(D.nachfolger(['a', 'b'], 'x'), null);
 });
+
+test('Weiteres Exemplar: eigene id, laufende Nummer, kein Datum, Format bleibt gültig', async () => {
+  const { weiteresExemplar } = await import('../assets/js/store.js');
+  const mtk = { ...ausKatalog(KATALOG.find((k) => k.id === 'mtk')), zuletzt: '2025-03-15', notiz: 'Sprechzimmer 1', intervallMonate: 12 };
+  const eigen = { id: 'eigen-x', katalogId: null, titel: 'Wartung Klimaanlage', intervallMonate: 6, zuletzt: null, notiz: '' };
+  const liste = [mtk, eigen];
+
+  const zwei = weiteresExemplar(liste, 'mtk');
+  assert.notEqual(zwei.id, 'mtk');
+  assert.equal(zwei.katalogId, 'mtk');
+  assert.equal(zwei.titel, `${mtk.titel} (2)`);
+  assert.equal(zwei.intervallMonate, 12);
+  assert.equal(zwei.zuletzt, null);
+  assert.equal(zwei.notiz, '');
+  liste.push(zwei);
+
+  // Vom zweiten Exemplar aus geht es mit (3) weiter, nicht mit „(2) (2)“.
+  const drei = weiteresExemplar(liste, zwei.id);
+  assert.equal(drei.titel, `${mtk.titel} (3)`);
+  liste.push(drei);
+  assert.equal(new Set(liste.map((p) => p.id)).size, liste.length);
+
+  assert.equal(weiteresExemplar(liste, 'eigen-x').titel, 'Wartung Klimaanlage (2)');
+  assert.equal(weiteresExemplar(liste, 'eigen-x').katalogId, null);
+  assert.equal(weiteresExemplar(liste, 'gibt-es-nicht'), null);
+
+  // Lange Bezeichnungen bleiben innerhalb von 120 Zeichen.
+  const lang = { ...eigen, id: 'eigen-lang', titel: 'x'.repeat(120) };
+  assert.ok(weiteresExemplar([lang], 'eigen-lang').titel.length <= 120);
+
+  // Gespeichert und wieder geladen bleiben alle Exemplare erhalten.
+  const z = normalisieren({ version: 2, pflichten: liste });
+  assert.equal(z.pflichten.filter((p) => p.katalogId === 'mtk').length, 3);
+  assert.equal(z.pflichten.find((p) => p.id === zwei.id).titel, zwei.titel);
+});

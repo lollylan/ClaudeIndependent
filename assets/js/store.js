@@ -87,6 +87,33 @@ export function ausKatalog(eintrag) {
   };
 }
 
+// Zweites, drittes … Exemplar einer vorhandenen Pflicht, etwa für mehrere Blutdruckmessgeräte
+// mit eigenen Prüfdaten. Übernimmt Katalogbezug und Intervall, aber kein Datum und keine Notiz.
+// Die Bezeichnung bekommt eine laufende Nummer, die der Nutzer überschreiben kann.
+// Das Speicherformat ändert sich dadurch nicht: katalogId durfte schon immer mehrfach vorkommen.
+export function weiteresExemplar(pflichten, quelleId) {
+  const quelle = pflichten.find((p) => p.id === quelleId);
+  if (!quelle) return null;
+  const titel = new Set(pflichten.map((p) => p.titel));
+  const basis = quelle.titel.replace(/ \(\d+\)$/, '');
+  let n = 2;
+  const mitNummer = (k) => `${basis.slice(0, 120 - ` (${k})`.length)} (${k})`;
+  while (titel.has(mitNummer(n))) n++;
+  const ids = new Set(pflichten.map((p) => p.id));
+  let id;
+  do {
+    id = `${quelle.katalogId || 'eigen'}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+  } while (ids.has(id));
+  return {
+    id,
+    katalogId: quelle.katalogId,
+    titel: mitNummer(n),
+    intervallMonate: quelle.intervallMonate,
+    zuletzt: null,
+    notiz: '',
+  };
+}
+
 export function eigenePflicht(titel, intervallMonate) {
   return {
     id: `eigen-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,

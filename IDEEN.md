@@ -5,7 +5,7 @@ Anregungen für den Nachtlauf. Keine Reihenfolge, keine Pflicht. Erledigtes stre
 ## Offen
 
 - ~~Druckansicht: Jahresübersicht der Stichtage als sauberes A4-Blatt für den QM-Ordner~~ (erledigt 22.11.2026, `#/druck`)
-- Mehrere Exemplare derselben Pflicht (z. B. drei Blutdruckmessgeräte mit eigenen Daten)
+- ~~Mehrere Exemplare derselben Pflicht (z. B. drei Blutdruckmessgeräte mit eigenen Daten)~~ (erledigt 26.11.2026: „Weiteres Exemplar“ unter „Details“, Bezeichnung dort änderbar)
 - Pflicht mit festem Kalendertermin statt Intervall (z. B. Abgabefrist immer am 10. nach Quartalsende)
 - Erledigt an einem anderen Tag als heute, ohne die Details aufzuklappen (für Pflichten ohne Datum seit 25.11.2026 gelöst; bei Pflichten mit Datum fehlt es noch, etwa als kleines „Anderer Tag …“ neben „Heute erledigt“)
 - Verlauf je Pflicht: wann wurde sie in der Vergangenheit erledigt
@@ -22,7 +22,10 @@ Anregungen für den Nachtlauf. Keine Reihenfolge, keine Pflicht. Erledigtes stre
 - Beim Einspielen einer Sicherung vorher fragen oder zusammenführen, statt den Stand zu ersetzen (bisher hilft nur „Rückgängig“)
 - ~~Datum per Tastatur eintippen~~ (erledigt 24.11.2026: Chrome/Edge meldeten schon „0002“ als Datum; jetzt `pruefeErledigtAm` in `datum.js`)
 - ~~Nach dem Startpaket stehen alle Pflichten ohne Datum da: Feld „Zuletzt erledigt“ direkt in der Zeile, danach zur nächsten Zeile ohne Datum springen~~ (erledigt 25.11.2026: `data-ort="zeile"`, Fokus und Bildschirmposition wandern mit)
-- Nach jeder Eingabe in „Details“ zeichnet Stichtag alles neu: Die Zeile springt in eine andere Gruppe, der Fokus landet wieder im Tagesteil des Datums, und ein Klick, der das Feld verlässt, kann verloren gehen. Neu zeichnen gezielter machen
+- Nach jeder Eingabe in „Details“ zeichnet Stichtag alles neu: Die Zeile springt in eine andere Gruppe, der Fokus landet wieder im Tagesteil des Datums, und ein Klick, der das Feld verlässt, kann verloren gehen. Neu zeichnen gezielter machen (26.11.2026 teilweise: Bei Bezeichnung, Intervall und Notiz geht der Fokus per Tab jetzt ins nächste Feld statt auf die Seite; der verlorene Klick bleibt)
+- Exemplare: Ein Exemplar sollte auch direkt im Katalog angelegt werden können, nicht nur über „Details“ in der Übersicht
+- Exemplare im Druckblatt und in der Übersicht nach Pflicht gruppieren, wenn es viele werden
+- Ins Zahlenfeld „Intervall“ getippte Ziffern hängen sich an den alten Wert an (aus 24 wird 2412 und dann ein Fehler); beim Betreten des Felds den Inhalt markieren
 - Datumseingabe in Firefox und Safari ausprobieren (bisher nur Chrome geprüft)
 - Gemeinsamen Sortier- und Statuscode von Übersicht (`angereichert` in `app.js`) und Druckblatt (`druck.js`) zusammenführen
 - Meldung nach „Heute erledigt“ an die neue Zeilen-Meldung angleichen (`D.stichtagSatz` mit Abstand in Worten)

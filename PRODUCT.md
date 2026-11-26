@@ -17,6 +17,7 @@ Der Nutzer wählt aus einem Katalog, was für seine Praxis gilt, und trägt ein,
 - Katalog mit 23 Pflichten in fünf Bereichen, jeweils mit Quelle; Richtwerte sind als solche markiert
 - Startpaket „Typische Hausarztpraxis“
 - Eigene Pflichten mit freiem Intervall
+- Mehrere Exemplare derselben Pflicht (etwa je Blutdruckmessgerät eine MTK), jedes mit eigener Bezeichnung und eigenem Datum
 - Übersicht nach Dringlichkeit: überfällig, in 30 Tagen, ohne Datum, später; bei Pflichten ohne Datum steht das Datumsfeld direkt in der Zeile, nach der Eingabe geht es zur nächsten
 - Jahresband über zwölf Monate mit Quartalsgrenzen
 - Sicherung als JSON-Datei mit Erinnerung, wenn noch nie oder vor über 30 Tagen gesichert wurde und sich seitdem etwas geändert hat; Export der Stichtage als Kalenderdatei (.ics)

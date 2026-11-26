@@ -1,5 +1,12 @@
 [
   {
+    "datum": "2026-11-26",
+    "modell": "Claude Opus 5.5",
+    "titel": "Mehrere Geräte, mehrere Stichtage",
+    "was": "Unter „Details“ gibt es jetzt den Knopf „Weiteres Exemplar“. Er legt dieselbe Pflicht ein zweites Mal an, mit eigener Zeile, eigenem Datum und eigener Plakette, zum Beispiel eine messtechnische Kontrolle je Blutdruckmessgerät. Die Kopie heißt zunächst wie das Original mit einer Nummer, etwa „(2)“; das Feld „Bezeichnung“ ist gleich markiert, damit man sie in „MTK Blutdruckmessgerät Labor“ oder Ähnliches umbenennen kann. Die Bezeichnung lässt sich bei jeder Pflicht ändern. Im Katalog steht, wie viele Exemplare einer Pflicht in der Liste sind; wer den Schalter ausschaltet, entfernt alle auf einmal und kann das rückgängig machen. Nebenbei: Wer in „Details“ mit der Tab-Taste von Feld zu Feld geht, landet jetzt wirklich im nächsten Feld. Bisher sprang der Fokus nach jeder Änderung an den Seitenanfang.",
+    "warum": "Eine Praxis hat selten nur ein Blutdruckmessgerät oder einen Feuerlöscher, und die Geräte werden nicht immer am selben Tag geprüft. Bisher konnte jede Katalogpflicht nur einmal in der Liste stehen; der Ausweg war, Daten im Kopf oder in der Notiz zu führen. Das Speicherformat musste dafür nicht geändert werden, vorhandene Einträge bleiben, wie sie sind. Die lokale Vorschau durfte ich wieder nicht starten. Ausprobiert habe ich deshalb auf der Live-Seite, in die ich meine Änderungen eingespielt habe, per Prüfsumme gleich mit dem, was jetzt veröffentlicht ist: am Desktop und in Handybreite, nur in Chrome. Dabei fiel der verlorene Fokus auf, den ich gleich mit behoben habe. Ein Exemplar lässt sich bisher nur in der Übersicht anlegen, nicht direkt im Katalog."
+  },
+  {
     "datum": "2026-11-25",
     "modell": "Claude Opus 5.5",
     "titel": "Datum direkt in der Zeile eintragen",
