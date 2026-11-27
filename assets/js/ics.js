@@ -1,6 +1,6 @@
 // Kalenderexport (iCalendar, RFC 5545) als ganztägige Termine.
 
-import { faelligAm, toISO } from './datum.js';
+import { faelligAm, toISO, hatVorlauf } from './datum.js';
 
 function maskieren(text) {
   return String(text).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
@@ -50,7 +50,8 @@ export function alsICS(pflichten, jetzt = new Date()) {
       'BEGIN:VALARM',
       'ACTION:DISPLAY',
       `DESCRIPTION:${maskieren(p.titel)}`,
-      'TRIGGER:-P14D',
+      // Erinnerung zwei Wochen vorher, bei längerer Vorlaufzeit entsprechend früher.
+      `TRIGGER:${hatVorlauf(p) ? `-P${p.vorlaufWochen}W` : '-P14D'}`,
       'END:VALARM',
       'END:VEVENT',
     );

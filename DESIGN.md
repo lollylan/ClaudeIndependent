@@ -20,7 +20,7 @@ Zurückhaltend: zwei Neutrale plus Tinte. Farbe tragen ausschließlich die drei 
 | `--tinte-leise` | `oklch(0.44 0.03 240)` | Nebentext (mind. 4.5:1 auf Grund) |
 | `--linie` / `--linie-stark` | `oklch(0.885 0.012 230)` / `oklch(0.6 0.02 235)` | Trennlinien / Feldränder, Quartalsgrenzen |
 | `--rot` / `--rot-text` | `oklch(0.57 0.21 27)` / `oklch(0.47 0.19 27)` | überfällig |
-| `--gelb` / `--gelb-text` | `oklch(0.86 0.17 92)` / `oklch(0.44 0.09 75)` | fällig in 30 Tagen |
+| `--gelb` / `--gelb-text` | `oklch(0.86 0.17 92)` / `oklch(0.44 0.09 75)` | fällig in 30 Tagen oder Vorlaufzeit begonnen |
 | `--gruen` / `--gruen-text` | `oklch(0.56 0.13 158)` / `oklch(0.41 0.1 158)` | geplant |
 | `--blau` | `oklch(0.52 0.16 255)` | nur Fokusring |
 
@@ -39,7 +39,7 @@ Seitentitel `clamp(2.25rem, 5.4vw, 4.25rem)`, Zeilenhöhe 1. Abschnittstitel 1.6
 
 - **Plakette** (`plakette.js`): Scheibe in Statusfarbe, zwölf Ringsegmente wie ein Zifferblatt (12 oben = Dezember), das Fälligkeitssegment hell bzw. in Tinte hervorgehoben, Jahr zweistellig in der Mitte. Klein (3rem) in jeder Zeile, groß mit Monatsziffern im Auftakt. Ohne Datum: gestrichelter leerer Kreis.
 - **Jahresband**: zwölf Monate ab dem laufenden, Spaltenbreite nach Tagen, Quartalsbeginn mit starker Linie und Q-Kennung, Tintenlinie für heute, ein Punkt je Stichtag; überlappende Punkte weichen in Spuren nach unten aus.
-- **Pflichtzeile**: Plakette, Titel mit Quelle und Takt, Termin mit Abstand, „Heute erledigt“ und „Details“. Ohne Datum steht an der Stelle des Termins ein kleines Datumsfeld (2.25rem hoch) mit leiser Beschriftung „Zuletzt erledigt am“. Details klappen in der Zeile auf, kein Dialogfenster: Hinweis zur Quelle, Bezeichnung (volle Breite), Intervall, Notiz, darunter „Weiteres Exemplar“ (umrandet) und „Aus meiner Liste entfernen“ (rot umrandet).
+- **Pflichtzeile**: Plakette, Titel mit Quelle und Takt, Termin mit Abstand, „Heute erledigt“ und „Details“. Ohne Datum steht an der Stelle des Termins ein kleines Datumsfeld (2.25rem hoch) mit leiser Beschriftung „Zuletzt erledigt am“. Details klappen in der Zeile auf, kein Dialogfenster: Hinweis zur Quelle, Bezeichnung (volle Breite), zuletzt erledigt (falls vorhanden), Intervall, Vorlauf in Wochen, Notiz, darunter „Weiteres Exemplar“ (umrandet) und „Aus meiner Liste entfernen“ (rot umrandet).
 - **Knopf**: Tinte gefüllt (Hauptaktion), umrandet (Nebenaktion), rot umrandet (Entfernen/Löschen). Höhe 2.75rem, klein 2.25rem, Radius 0.625rem.
 - **Schalter**: im Katalog, Tinte wenn aktiv.
 - **Druckblatt** (`#/druck`): Tabelle auf Fläche, Stand in Worten mit kleinem Statuspunkt. Im Druck nur Tinte auf Weiß, Haarlinien, Kopfzeile wiederholt sich je Seite, Zeilen brechen nicht um; Kopf, Navigation, Fuß und Knöpfe entfallen.

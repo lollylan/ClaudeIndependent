@@ -1,13 +1,19 @@
 // Speicherung ausschließlich im localStorage dieses Browsers.
 // Es gibt keinen Server und keine Netzwerkübertragung der Nutzerdaten.
 
-import { istISO, parseISO, tageBis, heute } from './datum.js';
+import { istISO, parseISO, tageBis, heute, VORLAUF_MAX_WOCHEN } from './datum.js';
 import { katalogEintrag } from './katalog.js';
 
 const SCHLUESSEL = 'stichtag.v1';
 // Version 2: gesichertAm und geaendertAm für den Hinweis auf eine fällige Sicherung.
 // Ältere Stände haben beides nicht und bekommen null; die Pflichten bleiben unverändert.
-export const VERSION = 2;
+// Version 3: vorlaufWochen je Pflicht. Ältere Pflichten bekommen 0, also die bisherige 30-Tage-Grenze.
+export const VERSION = 3;
+
+function vorlauf(wert) {
+  const n = Math.round(Number(wert));
+  return n >= 0 && n <= VORLAUF_MAX_WOCHEN ? n : 0;
+}
 
 // Ab so vielen Tagen seit der letzten Sicherung erinnert Stichtag, sofern sich seitdem etwas geändert hat.
 export const SICHERUNG_TAGE = 30;
@@ -40,6 +46,7 @@ export function normalisieren(roh) {
       intervallMonate: intervall,
       zuletzt: istISO(p.zuletzt) ? p.zuletzt : null,
       notiz: typeof p.notiz === 'string' ? p.notiz.slice(0, 500) : '',
+      vorlaufWochen: vorlauf(p.vorlaufWochen),
     });
   }
   return z;
@@ -84,11 +91,12 @@ export function ausKatalog(eintrag) {
     intervallMonate: eintrag.intervallMonate,
     zuletzt: null,
     notiz: '',
+    vorlaufWochen: 0,
   };
 }
 
 // Zweites, drittes … Exemplar einer vorhandenen Pflicht, etwa für mehrere Blutdruckmessgeräte
-// mit eigenen Prüfdaten. Übernimmt Katalogbezug und Intervall, aber kein Datum und keine Notiz.
+// mit eigenen Prüfdaten. Übernimmt Katalogbezug, Intervall und Vorlauf, aber kein Datum und keine Notiz.
 // Die Bezeichnung bekommt eine laufende Nummer, die der Nutzer überschreiben kann.
 // Das Speicherformat ändert sich dadurch nicht: katalogId durfte schon immer mehrfach vorkommen.
 export function weiteresExemplar(pflichten, quelleId) {
@@ -111,6 +119,7 @@ export function weiteresExemplar(pflichten, quelleId) {
     intervallMonate: quelle.intervallMonate,
     zuletzt: null,
     notiz: '',
+    vorlaufWochen: vorlauf(quelle.vorlaufWochen),
   };
 }
 
@@ -122,5 +131,6 @@ export function eigenePflicht(titel, intervallMonate) {
     intervallMonate,
     zuletzt: null,
     notiz: '',
+    vorlaufWochen: 0,
   };
 }

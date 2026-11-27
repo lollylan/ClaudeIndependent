@@ -206,3 +206,59 @@ test('Weiteres Exemplar: eigene id, laufende Nummer, kein Datum, Format bleibt g
   assert.equal(z.pflichten.filter((p) => p.katalogId === 'mtk').length, 3);
   assert.equal(z.pflichten.find((p) => p.id === zwei.id).titel, zwei.titel);
 });
+
+test('Vorlaufzeit: verlängert die Warnzeit, nie kürzer als 30 Tage', () => {
+  const heute = tag('2026-11-27');
+  // Fällig am 27.01.2027, also in 61 Tagen.
+  const p = (vorlaufWochen) => ({ zuletzt: '2022-01-27', intervallMonate: 60, vorlaufWochen });
+  assert.equal(D.status(p(0), heute), 'geplant');
+  assert.equal(D.status(p(undefined), heute), 'geplant');
+  assert.equal(D.status(p(8), heute), 'geplant'); // 56 Tage Vorlauf, 61 Tage Abstand
+  assert.equal(D.status(p(9), heute), 'bald'); // 63 Tage Vorlauf
+  assert.equal(D.vorwarnTage(p(2)), D.BALD_TAGE);
+  assert.equal(D.hatVorlauf(p(4)), false);
+  assert.equal(D.hatVorlauf(p(5)), true);
+  assert.equal(D.vorlaufText(1), '1 Woche Vorlauf');
+  assert.equal(D.vorlaufText(8), '8 Wochen Vorlauf');
+});
+
+test('Vorlaufzeit: Speicherformat Version 3, alte Stände bleiben erhalten', async () => {
+  const { VERSION, weiteresExemplar, eigenePflicht } = await import('../assets/js/store.js');
+  assert.equal(VERSION, 3);
+  const alt = normalisieren({ version: 2, gesichertAm: '2026-11-01', pflichten: [{ ...ausKatalog(KATALOG[0]), zuletzt: '2026-01-15', vorlaufWochen: undefined }] });
+  assert.equal(alt.pflichten[0].vorlaufWochen, 0);
+  assert.equal(alt.pflichten[0].zuletzt, '2026-01-15');
+  assert.equal(alt.gesichertAm, '2026-11-01');
+  const z = normalisieren({ pflichten: [
+    { id: 'a', titel: 'A', intervallMonate: 12, vorlaufWochen: 8 },
+    { id: 'b', titel: 'B', intervallMonate: 12, vorlaufWochen: 99 },
+    { id: 'c', titel: 'C', intervallMonate: 12, vorlaufWochen: 'acht' },
+    { id: 'd', titel: 'D', intervallMonate: 12, vorlaufWochen: -3 },
+  ] });
+  assert.deepEqual(z.pflichten.map((p) => p.vorlaufWochen), [8, 0, 0, 0]);
+  assert.equal(ausKatalog(KATALOG[0]).vorlaufWochen, 0);
+  assert.equal(eigenePflicht('X', 12).vorlaufWochen, 0);
+  // Ein weiteres Exemplar braucht denselben Vorlauf wie das Gerät, von dem es kopiert wurde.
+  assert.equal(weiteresExemplar([{ ...ausKatalog(KATALOG[0]), vorlaufWochen: 6 }], KATALOG[0].id).vorlaufWochen, 6);
+});
+
+test('Vorlaufzeit in Druckblatt und Kalenderdatei', async () => {
+  const { druckZeilen, druckZusammenfassung } = await import('../assets/js/druck.js');
+  const heute = tag('2026-11-27');
+  const zeilen = druckZeilen([
+    { id: 'a', katalogId: null, titel: 'Karte', intervallMonate: 60, zuletzt: '2022-01-27', notiz: '', vorlaufWochen: 10 },
+    { id: 'b', katalogId: null, titel: 'Ohne', intervallMonate: 12, zuletzt: '2026-01-10', notiz: '', vorlaufWochen: 0 },
+  ], heute);
+  const karte = zeilen.find((z) => z.id === 'a');
+  assert.equal(karte.stand, 'bald fällig');
+  assert.equal(karte.vorlauf, '10 Wochen Vorlauf');
+  assert.equal(zeilen.find((z) => z.id === 'b').vorlauf, '');
+  assert.equal(druckZusammenfassung(zeilen), '2 Pflichten, 1 bald fällig');
+
+  const ics = alsICS([
+    { id: 'a', titel: 'Karte', intervallMonate: 60, zuletzt: '2022-01-27', notiz: '', vorlaufWochen: 10 },
+    { id: 'b', titel: 'Kurz', intervallMonate: 12, zuletzt: '2026-01-10', notiz: '', vorlaufWochen: 3 },
+  ], new Date(Date.UTC(2026, 10, 27)));
+  assert.ok(ics.includes('TRIGGER:-P10W'));
+  assert.ok(ics.includes('TRIGGER:-P14D'));
+});

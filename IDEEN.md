@@ -11,7 +11,7 @@ Anregungen für den Nachtlauf. Keine Reihenfolge, keine Pflicht. Erledigtes stre
 - Verlauf je Pflicht: wann wurde sie in der Vergangenheit erledigt
 - Filter oder Suche, sobald die Liste lang wird
 - Katalog erweitern (jeweils Primärquelle prüfen): Fachrichtungen jenseits der Hausarztpraxis, Laborqualitätssicherung, Aufbewahrungsfristen als eigene Art von Stichtag
-- Vorlaufzeit je Pflicht (manche brauchen acht Wochen Vorlauf, etwa die eHBA-Folgekarte)
+- ~~Vorlaufzeit je Pflicht (manche brauchen acht Wochen Vorlauf, etwa die eHBA-Folgekarte)~~ (erledigt 27.11.2026: „Vorlauf in Wochen“ unter „Details“, wirkt auf Status, Druckblatt und Kalendererinnerung)
 - ~~Hinweis auf eine veraltete Sicherung~~ (erledigt 23.11.2026: Zeile unter dem Jahresband, Schwelle 30 Tage mit Änderungen; im Browser noch nicht angesehen, die Vorschau durfte nicht starten)
 - Offline nutzbar machen (Service Worker, nur eigene Dateien)
 - Tastaturkürzel und Sprunganker für häufige Wege
@@ -22,14 +22,17 @@ Anregungen für den Nachtlauf. Keine Reihenfolge, keine Pflicht. Erledigtes stre
 - Beim Einspielen einer Sicherung vorher fragen oder zusammenführen, statt den Stand zu ersetzen (bisher hilft nur „Rückgängig“)
 - ~~Datum per Tastatur eintippen~~ (erledigt 24.11.2026: Chrome/Edge meldeten schon „0002“ als Datum; jetzt `pruefeErledigtAm` in `datum.js`)
 - ~~Nach dem Startpaket stehen alle Pflichten ohne Datum da: Feld „Zuletzt erledigt“ direkt in der Zeile, danach zur nächsten Zeile ohne Datum springen~~ (erledigt 25.11.2026: `data-ort="zeile"`, Fokus und Bildschirmposition wandern mit)
-- Nach jeder Eingabe in „Details“ zeichnet Stichtag alles neu: Die Zeile springt in eine andere Gruppe, der Fokus landet wieder im Tagesteil des Datums, und ein Klick, der das Feld verlässt, kann verloren gehen. Neu zeichnen gezielter machen (26.11.2026 teilweise: Bei Bezeichnung, Intervall und Notiz geht der Fokus per Tab jetzt ins nächste Feld statt auf die Seite; der verlorene Klick bleibt)
+- Nach jeder Eingabe in „Details“ zeichnet Stichtag alles neu: Die Zeile springt in eine andere Gruppe, der Fokus landet wieder im Tagesteil des Datums, und ein Klick, der das Feld verlässt, kann verloren gehen. Neu zeichnen gezielter machen (26.11.2026 teilweise: Bei Bezeichnung, Intervall und Notiz geht der Fokus per Tab jetzt ins nächste Feld statt auf die Seite; 27.11.2026: Springt die Zeile in eine andere Gruppe, folgt die Ansicht; der verlorene Klick bleibt)
 - Exemplare: Ein Exemplar sollte auch direkt im Katalog angelegt werden können, nicht nur über „Details“ in der Übersicht
 - Exemplare im Druckblatt und in der Übersicht nach Pflicht gruppieren, wenn es viele werden
-- Ins Zahlenfeld „Intervall“ getippte Ziffern hängen sich an den alten Wert an (aus 24 wird 2412 und dann ein Fehler); beim Betreten des Felds den Inhalt markieren
+- ~~Ins Zahlenfeld „Intervall“ getippte Ziffern hängen sich an den alten Wert an~~ (erledigt 27.11.2026: Inhalt wird beim Betreten markiert)
 - Datumseingabe in Firefox und Safari ausprobieren (bisher nur Chrome geprüft)
 - Gemeinsamen Sortier- und Statuscode von Übersicht (`angereichert` in `app.js`) und Druckblatt (`druck.js`) zusammenführen
 - Meldung nach „Heute erledigt“ an die neue Zeilen-Meldung angleichen (`D.stichtagSatz` mit Abstand in Worten)
 - Beim Startpaket gleich in die erste Zeile ohne Datum springen statt auf die Überschrift
+- Vorlauf auch im Katalog vorschlagen, wo eine Quelle ihn belegt (etwa Bestellfristen für Folgekarten); bisher bewusst leer
+- Ein Vorlauf beim Anlegen eines weiteren Exemplars wird mitkopiert; prüfen, ob das in der Praxis stört
+- In den Details stehen die Eingabefelder durch den Hilfstext unter „Vorlauf“ wenige Pixel versetzt; bei Gelegenheit die Felder unten bündig ausrichten
 - Bei „eHBA läuft ab“ passt „Zuletzt erledigt am“ schlecht; dort eher „Karte ausgestellt am“ oder ein festes Ablaufdatum (hängt an der Idee mit festen Kalenderterminen)
 
 ## Gescheitert

@@ -6,7 +6,7 @@ import { katalogEintrag } from './katalog.js';
 
 const STAND = {
   ueberfaellig: 'überfällig',
-  bald: 'in 30 Tagen',
+  bald: 'bald fällig',
   geplant: 'geplant',
   offen: 'ohne Datum',
 };
@@ -24,6 +24,7 @@ export function druckZeilen(pflichten, stichtag = D.heute()) {
         titel: p.titel,
         grundlage: k ? k.grundlage : 'Eigene Pflicht',
         takt: D.intervallText(p.intervallMonate),
+        vorlauf: D.hatVorlauf(p) ? D.vorlaufText(p.vorlaufWochen) : '',
         richtwert: Boolean(k && k.richtwert && k.intervallMonate === p.intervallMonate),
         notiz: p.notiz || '',
         zuletzt: p.zuletzt ? D.formatDatum(D.parseISO(p.zuletzt)) : '',
@@ -44,7 +45,7 @@ export function druckZusammenfassung(zeilen) {
   const bald = zaehle('bald');
   const offen = zaehle('offen');
   if (ue) teile.push(`${ue} überfällig`);
-  if (bald) teile.push(`${bald} in den nächsten 30 Tagen`);
+  if (bald) teile.push(`${bald} bald fällig`);
   if (offen) teile.push(`${offen} ohne Datum`);
   return teile.join(', ');
 }

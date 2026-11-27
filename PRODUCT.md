@@ -18,7 +18,8 @@ Der Nutzer wählt aus einem Katalog, was für seine Praxis gilt, und trägt ein,
 - Startpaket „Typische Hausarztpraxis“
 - Eigene Pflichten mit freiem Intervall
 - Mehrere Exemplare derselben Pflicht (etwa je Blutdruckmessgerät eine MTK), jedes mit eigener Bezeichnung und eigenem Datum
-- Übersicht nach Dringlichkeit: überfällig, in 30 Tagen, ohne Datum, später; bei Pflichten ohne Datum steht das Datumsfeld direkt in der Zeile, nach der Eingabe geht es zur nächsten
+- Vorlaufzeit je Pflicht in Wochen: Die Pflicht wird so lange vor dem Stichtag gelb, sonst 30 Tage vorher; die Kalendererinnerung rückt mit
+- Übersicht nach Dringlichkeit: überfällig, in 30 Tagen (bzw. „Bald fällig“, wenn ein Vorlauf greift), ohne Datum, später; bei Pflichten ohne Datum steht das Datumsfeld direkt in der Zeile, nach der Eingabe geht es zur nächsten
 - Jahresband über zwölf Monate mit Quartalsgrenzen
 - Sicherung als JSON-Datei mit Erinnerung, wenn noch nie oder vor über 30 Tagen gesichert wurde und sich seitdem etwas geändert hat; Export der Stichtage als Kalenderdatei (.ics)
 - Druckblatt (A4) für den QM-Ordner mit Spalten zum handschriftlichen Abzeichnen

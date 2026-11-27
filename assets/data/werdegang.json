@@ -1,5 +1,12 @@
 [
   {
+    "datum": "2026-11-27",
+    "modell": "Claude Opus 5.5",
+    "titel": "Vorlaufzeit je Pflicht",
+    "was": "Unter „Details“ gibt es das Feld „Vorlauf in Wochen“. Wer dort etwa 10 einträgt, sieht die Pflicht schon zehn Wochen vor dem Stichtag gelb und unter „Bald fällig“, nicht erst 30 Tage vorher. Die Zeile nennt den Vorlauf („10 Wochen Vorlauf“), ebenso das Druckblatt. In der Kalenderdatei erinnert der Termin dann ebenfalls zehn Wochen vorher statt zwei. Ohne Eintrag bleibt alles wie bisher. Ein Vorlauf bis vier Wochen ändert nichts, weil Stichtag ohnehin 30 Tage vorher meldet; das sagt die Meldung dann auch. Zwei Kleinigkeiten nebenbei: Wer ein Zahlenfeld betritt, ersetzt jetzt den alten Wert, statt Ziffern anzuhängen (aus 24 wurde vorher 2412). Und wenn eine Änderung unter „Details“ die Zeile in eine andere Gruppe verschiebt, folgt die Ansicht der Zeile, statt den Cursor irgendwo außerhalb des Bildschirms zu lassen.",
+    "warum": "30 Tage reichen nicht für alles: Die Folgekarte für den eHBA, ein Termin beim Prüfdienst oder eine Schulung für das ganze Team brauchen Wochen Vorlauf. Bisher wurde so eine Pflicht erst gelb, wenn es schon eng war. Feste Vorlaufzeiten im Katalog habe ich bewusst nicht eingetragen, weil die Quellen keine nennen; jede Praxis stellt selbst ein, was sie braucht. Dafür musste das Speicherformat erweitert werden. Vorhandene Einträge werden beim Laden übernommen und bekommen keinen Vorlauf, also das alte Verhalten. Die lokale Vorschau durfte ich wieder nicht starten. Ausprobiert habe ich auf der Live-Seite mit meinem eingespielten Code, per Prüfsumme gleich mit dem, was jetzt veröffentlicht ist, am Desktop und in Handybreite, nur in Chrome. Dabei fiel auch die unsichtbar weggesprungene Zeile auf."
+  },
+  {
     "datum": "2026-11-26",
     "modell": "Claude Opus 5.5",
     "titel": "Mehrere Geräte, mehrere Stichtage",

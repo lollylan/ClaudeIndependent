@@ -100,7 +100,10 @@ function ansichtUebersicht() {
   const naechste = liste.find((p) => p.faellig);
 
   let titel;
+  // Mit Vorlaufzeit kann eine Pflicht schon Monate vorher „bald“ sein; dann stimmt „30 Tage“ nicht mehr.
+  const baldWeiter = bald.some((p) => p.tage > D.BALD_TAGE);
   if (ueberfaellig.length) titel = ueberfaellig.length === 1 ? 'Eine Pflicht ist überfällig.' : `${zahlwort(ueberfaellig.length)} Pflichten sind überfällig.`;
+  else if (bald.length && baldWeiter) titel = bald.length === 1 ? 'Ein Stichtag rückt näher.' : `${zahlwort(bald.length)} Stichtage rücken näher.`;
   else if (bald.length) titel = bald.length === 1 ? 'Ein Stichtag in den nächsten 30 Tagen.' : `${zahlwort(bald.length)} Stichtage in den nächsten 30 Tagen.`;
   else if (!naechste) titel = 'Wann war es zuletzt so weit?';
   else titel = 'Alles im Takt.';
@@ -127,7 +130,9 @@ function ansichtUebersicht() {
     ${jahresband(liste)}
     ${sicherungsZeile()}
     ${gruppe('Überfällig', ueberfaellig)}
-    ${gruppe('In den nächsten 30 Tagen', bald)}
+    ${baldWeiter
+    ? gruppe('Bald fällig', bald, 'Fällig in den nächsten 30 Tagen, oder die eingestellte Vorlaufzeit hat begonnen.')
+    : gruppe('In den nächsten 30 Tagen', bald)}
     ${gruppe('Noch ohne Datum', offen, 'Sobald das letzte Datum eingetragen ist, erscheint die Pflicht im Kalender.')}
     ${gruppe('Später', geplant)}`;
 }
@@ -203,7 +208,8 @@ function gruppe(titel, liste, hinweis = '') {
 function pflichtZeile(p) {
   const offen = aufgeklappt.has(p.id);
   const k = p.katalog;
-  const unterzeile = [k ? esc(k.grundlage) : 'Eigene Pflicht', D.intervallText(p.intervallMonate)].join(' · ');
+  const unterzeile = [k ? esc(k.grundlage) : 'Eigene Pflicht', D.intervallText(p.intervallMonate), D.hatVorlauf(p) ? D.vorlaufText(p.vorlaufWochen) : '']
+    .filter(Boolean).join(' · ');
   const richtwert = k && k.richtwert && k.intervallMonate === p.intervallMonate ? ' <span class="marke-richtwert">Richtwert</span>' : '';
   const heuteISO = D.toISO(D.heute());
   // Ohne Datum steht das Feld gleich in der Zeile: Nach dem Startpaket ist das die erste Arbeit.
@@ -237,6 +243,9 @@ function pflichtZeile(p) {
         </label>` : ''}
         <label class="feld">Intervall in Monaten
           <input type="number" inputmode="numeric" min="1" max="240" step="1" value="${p.intervallMonate}" data-feld="intervallMonate" data-id="${esc(p.id)}">
+        </label>
+        <label class="feld">Vorlauf in Wochen <small>Ohne Angabe gelb ab 30 Tagen vorher</small>
+          <input type="number" inputmode="numeric" min="0" max="${D.VORLAUF_MAX_WOCHEN}" step="1" value="${p.vorlaufWochen || ''}" placeholder="z. B. 8" data-feld="vorlaufWochen" data-id="${esc(p.id)}">
         </label>
         <label class="feld">Notiz <small>Keine Namen, keine Patientendaten</small>
           <input type="text" maxlength="500" value="${esc(p.notiz)}" placeholder="z. B. Prüffirma, Raum, Gerät" data-feld="notiz" data-id="${esc(p.id)}">
@@ -388,7 +397,7 @@ function ansichtDruck() {
             <span class="druck__titel">${esc(z.titel)}</span>
             <span class="druck__quelle">${esc(z.grundlage)}${z.notiz ? ` · ${esc(z.notiz)}` : ''}</span>
           </th>
-          <td>${esc(z.takt)}${z.richtwert ? '<span class="druck__richtwert">Richtwert</span>' : ''}</td>
+          <td>${esc(z.takt)}${z.richtwert ? '<span class="druck__richtwert">Richtwert</span>' : ''}${z.vorlauf ? `<span class="druck__quelle">${esc(z.vorlauf)}</span>` : ''}</td>
           <td class="druck__datum">${z.zuletzt || '–'}</td>
           <td class="druck__datum"><strong>${z.faellig || '–'}</strong></td>
           <td><span class="druck__stand">${z.stand}</span></td>
@@ -503,7 +512,14 @@ function zeichnen({ neueSeite = false, frisch = null } = {}) {
     window.scrollTo(0, 0);
     inhalt.querySelector('h1')?.focus({ preventScroll: true });
   } else if (fokus) {
-    inhalt.querySelector(fokus)?.focus({ preventScroll: true });
+    const ziel = inhalt.querySelector(fokus);
+    ziel?.focus({ preventScroll: true });
+    // Ein Feld unter „Details“ kann seine Zeile in eine andere Gruppe schieben, etwa nach einer
+    // Änderung von Intervall oder Vorlauf. Dann der Zeile folgen, statt den Fokus unsichtbar zu lassen.
+    if (ziel?.dataset.feld) {
+      const r = ziel.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > window.innerHeight) ziel.closest('.pflicht')?.scrollIntoView({ block: 'center' });
+    }
   }
   if (frisch) document.getElementById(`p-${frisch}`)?.classList.add('ist-frisch');
   if (r === 'werdegang' && werdegangDaten === null) ladeWerdegang();
@@ -693,6 +709,20 @@ inhalt.addEventListener('change', (e) => {
       }
       return nachFokuswechsel(() => aendern((z) => { z.pflichten.find((x) => x.id === id).intervallMonate = n; }, ''));
     }
+    if (feld === 'vorlaufWochen') {
+      const roh = el.value.trim();
+      const n = roh === '' ? 0 : Math.round(Number(roh));
+      if (!(n >= 0 && n <= D.VORLAUF_MAX_WOCHEN)) {
+        melden(`Der Vorlauf muss zwischen 0 und ${D.VORLAUF_MAX_WOCHEN} Wochen liegen.`, false);
+        el.value = p.vorlaufWochen || '';
+        return;
+      }
+      if (n === (p.vorlaufWochen || 0)) return;
+      const text = n > 0 && !D.hatVorlauf({ vorlaufWochen: n })
+        ? 'Gespeichert. Bis vier Wochen ändert das nichts: Stichtag meldet jede Pflicht ohnehin 30 Tage vorher.'
+        : '';
+      return nachFokuswechsel(() => aendern((z) => { z.pflichten.find((x) => x.id === id).vorlaufWochen = n; }, text));
+    }
     if (feld === 'titel') {
       const titel = el.value.trim().slice(0, 120);
       if (!titel) {
@@ -738,6 +768,13 @@ inhalt.addEventListener('focusout', (e) => {
   } else if (art === 'leer' && p.zuletzt) {
     aendern((z) => { z.pflichten.find((x) => x.id === id).zuletzt = null; }, 'Datum entfernt.');
   }
+});
+
+// Zahlenfelder: Beim Betreten ist der Inhalt markiert, damit eine getippte Zahl den alten Wert
+// ersetzt, statt sich anzuhängen (aus 24 wurde sonst 2412).
+inhalt.addEventListener('focusin', (e) => {
+  const el = e.target;
+  if (el.type === 'number' && el.dataset?.feld) el.select();
 });
 
 inhalt.addEventListener('submit', (e) => {

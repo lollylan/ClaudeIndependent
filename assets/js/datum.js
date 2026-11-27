@@ -65,13 +65,31 @@ export function faelligAm(pflicht) {
   return addMonate(parseISO(pflicht.zuletzt), pflicht.intervallMonate);
 }
 
+// Vorlaufzeit je Pflicht in Wochen, etwa für einen Prüftermin, der Wochen vorher gebucht
+// werden muss. Sie verlängert nur: Unter BALD_TAGE gilt weiter die 30-Tage-Grenze.
+export const VORLAUF_MAX_WOCHEN = 52;
+
+export function vorwarnTage(pflicht) {
+  const w = Number(pflicht.vorlaufWochen) || 0;
+  return Math.max(BALD_TAGE, w * 7);
+}
+
+// Wirkt die Vorlaufzeit, also länger als die 30-Tage-Grenze?
+export function hatVorlauf(pflicht) {
+  return vorwarnTage(pflicht) > BALD_TAGE;
+}
+
+export function vorlaufText(wochen) {
+  return wochen === 1 ? '1 Woche Vorlauf' : `${wochen} Wochen Vorlauf`;
+}
+
 // 'offen' = noch kein Datum hinterlegt.
 export function status(pflicht, stichtag = heute()) {
   const f = faelligAm(pflicht);
   if (!f) return 'offen';
   const t = tageBis(stichtag, f);
   if (t < 0) return 'ueberfaellig';
-  if (t <= BALD_TAGE) return 'bald';
+  if (t <= vorwarnTage(pflicht)) return 'bald';
   return 'geplant';
 }
 
